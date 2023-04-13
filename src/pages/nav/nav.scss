@@ -1,0 +1,16 @@
+.nav-block {
+  display: flex;
+  flex-direction: column;
+  .nav-header {
+    background-color: #001529;
+    color: aqua;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    font-size: 20px;
+  }
+  .nav-menu {
+    height: 100%;
+  }
+}
