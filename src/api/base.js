@@ -22,11 +22,15 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   response => {
     // 对响应数据做点什么
-    const { data, status } = response;
+    const { data, status, code, message } = response;
     if (status === 200) {
       return Promise.resolve(data);
     } else {
-      return Promise.reject(response);
+      return Promise.reject(data || {
+        code,
+        data,
+        message
+      });
     }
   }
 );

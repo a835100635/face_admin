@@ -1,10 +1,11 @@
 
-import { Space, Table, Button, Modal, Form, Input, Select } from 'antd';
+import { Space, Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { useState, useEffect } from 'react';
 import './category.scss'
-import { getCategoryList } from '../../../api/category';
+import { getCategoryList, addCatrgotyData } from '../../../api/category';
 
 function Category() {
+  const [messageApi, contextHolder] = message.useMessage();
 
   const columns = [
     {
@@ -49,17 +50,46 @@ function Category() {
   ];
 
   const [data, setData] = useState([])
-
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 编辑类型
   const [ediType, setEdiType] = useState('add');
-
+  
   const handleModalCancel = () => {
     setIsModalOpen(false);
   }
-  const handleModalOk = () => {
-    setIsModalOpen(false);
+  
+  // 旧数据
+  const oldCategoryData = {}
+  const categoryData = {}
+  const [form] = Form.useForm();
+  const handleModalOk = async () => {
+    try {
+      // 校验数据
+      await form.validateFields();
+      const formData = form.getFieldsValue();
+      if(ediType === 'add') {
+        addCatrgoty(formData)
+      }
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: '请输入完整',
+      })
+    }
   }
+  const addCatrgoty = (data) => {
+    addCatrgotyData(data).then((res) => {
+      console.log('res', res)
+      setIsModalOpen(false);
+    }).catch((error) => {
+      messageApi.open({
+        type: 'error',
+        content: error.message,
+      })
+    })
+  }
+
   const openModal = (type) => {
     // 设置编辑类型
     setEdiType(type);
@@ -96,15 +126,14 @@ function Category() {
     })
     setData(list);
   }
-
   useEffect(() => {
     fetchData();
   }, [])
 
-  const [categoryData, setCategoryData] = useState({})
 
   return (
     <main className="category-wrap">
+      {contextHolder}
       <header className="filter-wrap">
         {/* <Input placeholder="" />; */}
         <Button type="primary" onClick={() => openModal('add')}>新增分类</Button>
@@ -113,6 +142,7 @@ function Category() {
       <Modal title={modalTitle()} open={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel}>
         <Form
           name="basic"
+          form={form}
           labelCol={{ span: 4 }} 
           wrapperCol={{span: 20}}
           onFinish={onFinish}
