@@ -2,7 +2,7 @@
 import { Space, Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { useState, useEffect } from 'react';
 import './category.scss'
-import { getCategoryList, addCatrgotyData } from '../../../api/category';
+import { getCategoryList, addCategoryData, updateCategoryData, deleteCategoryAction } from '../../../api/category';
 
 function Category() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -15,10 +15,10 @@ function Category() {
     },
     {
       title: '所属分类',
-      key: 'type',
+      key: 'typeId',
       render: (text, record) => {
         return (
-          <span>{record.type === 0 ? '一级分类' : '二级分类'}</span>
+          <span>{record.typeId === 0 ? '前端' : '后端'}</span>
         )
       }
     },
@@ -40,9 +40,10 @@ function Category() {
     {
       title: '操作',
       key: 'operation',
+      width: 160,
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => openModal('edit')}>编辑</Button>
+          <Button type="link" onClick={() => openModal('edit', record)}>编辑</Button>
           <Button type="link" onClick={() => deleteCategory(record)}>删除</Button>
         </Space>
       ),
@@ -56,12 +57,14 @@ function Category() {
   const [ediType, setEdiType] = useState('add');
   
   const handleModalCancel = () => {
+    form.resetFields();
+    setOldCategoryData({})
     setIsModalOpen(false);
   }
   
   // 旧数据
-  const oldCategoryData = {}
-  const categoryData = {}
+  const [oldCategoryData, setOldCategoryData] = useState({})
+  let categoryData = {}
   const [form] = Form.useForm();
   const handleModalOk = async () => {
     try {
@@ -69,8 +72,13 @@ function Category() {
       await form.validateFields();
       const formData = form.getFieldsValue();
       if(ediType === 'add') {
-        addCatrgoty(formData)
+        addCategory(formData)
       }
+      if (ediType === 'edit') {
+        updateCategory(formData)
+      }
+      form.resetFields();
+      setOldCategoryData({})
     } catch (error) {
       messageApi.open({
         type: 'error',
@@ -78,10 +86,14 @@ function Category() {
       })
     }
   }
-  const addCatrgoty = (data) => {
-    addCatrgotyData(data).then((res) => {
-      console.log('res', res)
+  const addCategory = (data) => {
+    addCategoryData(data).then((res) => {
       setIsModalOpen(false);
+      fetchData();
+      messageApi.open({
+        type: 'success',
+        content: '新增成功',
+      })
     }).catch((error) => {
       messageApi.open({
         type: 'error',
@@ -90,14 +102,49 @@ function Category() {
     })
   }
 
-  const openModal = (type) => {
+  const updateCategory = (data) => {
+    const updateData = {
+      ...oldCategoryData,
+      ...data
+    }
+    updateCategoryData(updateData).then(() => {
+      setIsModalOpen(false);
+      fetchData();
+      messageApi.open({
+        type: 'success',
+        content: '更新成功',
+      })
+    }).catch((error) => {
+      messageApi.open({
+        type: 'error',
+        content: error.message,
+      })
+    })
+  }
+
+  const openModal = (type, record) => {
     // 设置编辑类型
     setEdiType(type);
+    if (type === 'edit' && record) {
+      setOldCategoryData(record)
+      form.setFieldsValue(record);
+    }
     // 打开弹窗
     setIsModalOpen(true);
   }
   const deleteCategory = (record) => {
-    console.log(record);
+    deleteCategoryAction(record.id).then(() => {
+      fetchData();
+      messageApi.open({
+        type: 'success',
+        content: '删除成功',
+      })
+    }).catch((error) => {
+      messageApi.open({
+        type: 'error',
+        content: error.message,
+      })
+    });
   }
 
   const modalTitle = () => {
@@ -114,15 +161,12 @@ function Category() {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-  const handleTypeChange = (value) => {
-    console.log(value);
-  }
 
   const fetchData = async () => {
     const result = await getCategoryList();
     const list = [];
-    Object.keys(result.data).forEach((key) => {
-      list.push(...result.data[key])
+    Object.keys(result).forEach((key) => {
+      list.push(...result[key])
     })
     setData(list);
   }
@@ -165,7 +209,7 @@ function Category() {
 
           <Form.Item
             label="所属分类"
-            name="type"
+            name="typeId"
             rules={[
               {
                 required: true,
@@ -174,7 +218,6 @@ function Category() {
             ]}
           >
             <Select
-              onChange={handleTypeChange}
               options={[
                 { value: 0, label: '前端' },
                 { value: 1, label: '后端' },

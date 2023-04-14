@@ -24,7 +24,7 @@ axiosInstance.interceptors.response.use(
     // 对响应数据做点什么
     const { data, status, code, message } = response;
     if (status === 200) {
-      return Promise.resolve(data);
+      return Promise.resolve(data.data);
     } else {
       return Promise.reject(data || {
         code,
@@ -41,6 +41,15 @@ export const $get = async (url, data = {}, configs = {}) => {
     params: data
   });
 };
+export const $delete = async (url, data = {}, configs = {}) => {
+  return axiosInstance.delete(url, {
+    ...configs,
+    params: data
+  });
+};
 export const $post = async (url, data = {}, configs = {}) => {
   return axiosInstance.post(url, data, configs);
+};
+export const $put = async (url, data = {}, configs = {}) => {
+  return axiosInstance.put(url, data, configs);
 };
