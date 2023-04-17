@@ -1,0 +1,27 @@
+.filter-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  .filter-input {
+    width: 180px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  .ant-select, .ant-picker  {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+}
+.topic-table {
+  .btns {
+    display: flex;
+    .ant-btn {
+      padding: 4px 4px;
+    }
+  }
+  .label {
+    // 超出省略号
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
