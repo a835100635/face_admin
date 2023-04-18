@@ -5,6 +5,7 @@ import locale from 'antd/locale/zh_CN';
 import { getCategoryList } from '../../../api/category';
 import { getTopics } from '../../../api/topic';
 import moment from 'moment';
+import EditTopic from './editTopic';
 
 const { RangePicker } = DatePicker;
 
@@ -121,6 +122,10 @@ class Topic extends Component {
         categoryOptions: [],
         total: 0,
         topicList: [],
+        isModalOpen: false,
+        editType: 'add',
+        // 当前编辑的题目
+        currentData: null,
         query: {
           topic: '',
           categoryId: '',
@@ -192,53 +197,85 @@ class Topic extends Component {
       })
     }
 
-    render() {
-      const handleChange = value => { console.log(value) }
+    /*
+    * modal
+    */
+    openAddModal() {
+      console.log('openAddModal')
+      this.setState({
+        isModalOpen: true
+      })
+    }
+    handleModalOk() {
+      console.log('handleModalOk')
+      this.setState({
+        isModalOpen: false
+      })
+    }
+    handleModalCancel() {
+      console.log('handleModalCancel')
+      this.setState({
+        isModalOpen: false
+      })
+    }
 
+    render() {
       return (
           <>
             <header className='filter-wrap'>
-              <Input className='filter-input' placeholder="输入题目名称" onPressEnter={(e) => this.changeInput(e)}/>
-              <Select
-                allowClear
-                placeholder="选择题目分类"
-                style={{ width: 150 }}
-                onChange={(categoryId) => this.selectChange(categoryId, 'categoryId')}
-                options={this.state.categoryOptions}
-              />
-              <Select
-                allowClear
-                placeholder="选择题目类型"
-                style={{ width: 150 }}
-                onChange={(categoryId) => this.selectChange(categoryId, 'type')}
-                options={this.typeOptions}
-              />
-              <Select
-                allowClear
-                placeholder="选择题目难度"
-                style={{ width: 150 }}
-                onChange={(categoryId) => this.selectChange(categoryId, 'level')}
-                options={this.levelOptions}
-              />
-              <Select
-                allowClear
-                placeholder="上线状态"
-                style={{ width: 150 }}
-                onChange={(categoryId) => this.selectChange(categoryId, 'online')}
-                options={this.onlineOptions}
-              />
-              <Select
-                allowClear
-                placeholder="审核状态"
-                style={{ width: 150 }}
-                onChange={(categoryId) => this.selectChange(categoryId, 'status')}
-                options={this.statusOptions}
-              />
-              <ConfigProvider locale={locale}>
-                <RangePicker />
-              </ConfigProvider>
+              <div className='left'>
+                <Input className='filter-input' placeholder="输入题目名称" onPressEnter={(e) => this.changeInput(e)}/>
+                <Select
+                  allowClear
+                  placeholder="选择题目分类"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'categoryId')}
+                  options={this.state.categoryOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="选择题目类型"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'type')}
+                  options={this.typeOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="选择题目难度"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'level')}
+                  options={this.levelOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="上线状态"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'online')}
+                  options={this.onlineOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="审核状态"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'status')}
+                  options={this.statusOptions}
+                />
+                <ConfigProvider locale={locale}>
+                  <RangePicker />
+                </ConfigProvider>
+              </div>
+              <div className='right'>
+                <Button type="primary" onClick={() => this.openAddModal()}>新增题目</Button>
+              </div>
             </header>
             <Table className='topic-table' columns={this.columns} dataSource={this.state.topicList} rowKey={i => i.id}/>
+
+            <EditTopic
+              currentData={this.state.currentData}
+              editType={this.state.editType}
+              isModalOpen={this.state.isModalOpen} 
+              onOk={() => this.handleModalOk()} 
+              onCancel={() => this.handleModalCancel()}/>
           </>
       );
     }

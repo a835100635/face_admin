@@ -1,4 +1,5 @@
 import Axios from 'axios';
+// import { message } from 'antd';
 
 // 全局设置
 const axiosInstance = Axios.create({
@@ -21,11 +22,13 @@ axiosInstance.interceptors.request.use(
 // 响应拦截器
 axiosInstance.interceptors.response.use(
   response => {
+    console.log('====', response)
     // 对响应数据做点什么
     const { data, status, code, message } = response;
     if (status === 200) {
       return Promise.resolve(data.data);
     } else {
+      message.error('sdd')
       return Promise.reject(data || {
         code,
         data,
