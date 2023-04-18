@@ -12,7 +12,7 @@ axiosInstance.interceptors.request.use(
   config => {
     // 发送请求前做些什么
     config.headers['X-ProductName'] = 'Face';
-    config.headers['X-Face-Token'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Im94eFFwNC1iMjNHVmRDNTBZX2tYZktlUC1RTE0iLCJpYXQiOjE2ODEyMDc3NTIsImV4cCI6MTY4MTgxMjU1Mn0.RD_Jko_L4vKfmPRBGAZ-BQNXUKNv-RcRYk3z7tuUI5Q';
+    config.headers['X-Face-Token'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Im94eFFwNC1iMjNHVmRDNTBZX2tYZktlUC1RTE0iLCJpYXQiOjE2ODE4MTI3MDAsImV4cCI6MTY4MjQxNzUwMH0.BeIWFLC5UdeVyleLZJhKPMo1n6tmZArXZb9F6Yer__A';
 
     return config;
   }

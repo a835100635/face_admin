@@ -9,7 +9,7 @@ function FeHeader(props) {
 
   return (
     <header className="fe-header">
-      <Button type="primary" onClick={ onClick }>
+      <Button type="text" onClick={ onClick }>
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </Button>
       <h1>Frontend Masters Intro to React</h1>
