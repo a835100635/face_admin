@@ -5,17 +5,117 @@ import locale from 'antd/locale/zh_CN';
 import { getCategoryList } from '../../../api/category';
 import { getTopics } from '../../../api/topic';
 import moment from 'moment';
+import EditTopic from './editTopic';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
+
 
 const { RangePicker } = DatePicker;
 
 class Topic extends Component {
     constructor() {
       super();
+      this.levelOptions = LEVEL_OPTIONS;
+      this.typeOptions = TOPIC_TYPE_OPTIONS;
+      this.onlineOptions = ONLINE_OPTIONS
+      this.statusOptions = STATUS_OPTIONS
+      this.columns = [
+        {
+          title: '题目名称',
+          key: 'topic',
+          dataIndex: 'topic',
+          width: 280,
+          render: (text, record) => (
+            <Tooltip title="prompt text">
+              <span className='label'>{record.topic}</span>
+            </Tooltip>
+          )
+        },
+        {
+          title: '题目分类',
+          key: 'categoryId',
+          dataIndex: 'categoryId',
+          render: (text, record) => (
+            <span>{this.state.categoryMap.get(record.categoryId).label}</span>
+          )
+        },
+        {
+          title: '题目类型',
+          key: 'type',
+          dataIndex: 'type',
+          render: (text, record) => (
+            <span>{this.typeOptions.find(item => item.value === record.type).label}</span>
+          )
+        },
+        {
+          title: '题目难度',
+          key: 'level',
+          dataIndex: 'level',
+          render: (text, record) => (
+            <span className='level'>{this.levelOptions.find(item => item.value === record.level).label}</span>
+          )
+        },
+        {
+          title: '上线状态',
+          key: 'online',
+          dataIndex: 'online',
+          render: (text, record) => (
+            <Tag color={record.online ? '#87d068' : ''}>
+              {this.onlineOptions.find(item => item.value === record.online).label}
+            </Tag>
+          )
+        },
+        {
+          title: '审核状态',
+          key: 'status',
+          dataIndex: 'status',
+          render: (text, record) => (
+            <Tag color={(() => {
+              switch (record.status) {
+                case 0:
+                  return '#2db7f5';
+                case 1:
+                  return '#87d068';
+                case 2:
+                  return '#f50';
+                default:
+                  return '';
+              }
+            })()}>
+              {this.statusOptions.find(item => item.value === record.status).label}
+            </Tag>
+          )
+        },
+        {
+          title: '创建时间',
+          key: 'createdTime',
+          dataIndex: 'createdTime',
+          render: (text, record) => (
+            <span>{moment(record.createdTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+          )
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 120,
+          render: (text, record) => (
+            <span className='btns'>
+              <Button type="link">预览</Button>
+              <Button type="link" onClick={() => this.handleEdit(record)}>编辑</Button>
+              <Button type="link" onClick={() => this.handleDelete(record)}>删除</Button>
+            </span>
+          ),
+        }
+      ]
+
       this.state = {
         categoryMap: new Map(),
         categoryOptions: [],
         total: 0,
         topicList: [],
+        isModalOpen: false,
+        editType: 'add',
+        // 当前编辑的题目
+        currentData: null,
         query: {
           topic: '',
           categoryId: '',
@@ -61,157 +161,122 @@ class Topic extends Component {
         console.log(err);
       })
     }
+    handleDelete(record) {
+      console.log(record);
+
+    }
+
+    changeInput(e) {
+      this.setState({
+        query: {
+          ...this.state.query,
+          topic: e.target.value
+        }
+      },() => {
+        this.getTopicList();
+      });
+    }
+    selectChange(value, key) {
+      this.setState({
+        query: {
+          ...this.state.query,
+          [key]: !['', undefined].includes(value) ? value : ''
+        }
+      }, () => {
+        this.getTopicList();
+      })
+    }
+
+    handleEdit(record) {
+      console.log(record);
+      this.setState({
+        currentData: record,
+        editType: 'edit'
+      }, () => {
+        this.openAddModal();
+      })
+    }
+
+    /*
+    * modal
+    */
+    openAddModal() {
+      console.log('openAddModal')
+      this.setState({
+        isModalOpen: true
+      })
+    }
+    handleModalOk() {
+      console.log('handleModalOk')
+      this.setState({
+        isModalOpen: false
+      })
+    }
+    handleModalCancel() {
+      console.log('handleModalCancel')
+      this.setState({
+        isModalOpen: false
+      })
+    }
 
     render() {
-      const levelOptions = Array.from({ length: 5 }, (v, k) => ({
-          label: k + 1,
-          value: k + 1
-      }));
-      const typeOptions = [
-          { label: '选择题', value: 1 },
-          { label: '填空', value: 2 },
-          { label: '判断题', value: 3 },
-          { label: '开放题', value: 4 },
-      ];
-      const onlineOptions = [
-        { label: '下线', value: 0 },
-        { label: '上线', value: 1 }
-      ]
-      const statusOptions = [
-        { label: '待审核', value: 0 },
-        { label: '审核通过', value: 1 },
-        { label: '审核不通过', value: 2 },
-      ]
-      const columns = [
-        {
-          title: '题目名称',
-          key: 'topic',
-          dataIndex: 'topic',
-          width: 280,
-          render: (text, record) => (
-            <Tooltip title="prompt text">
-              <span className='label'>{record.topic}</span>
-            </Tooltip>
-          )
-        },
-        {
-          title: '题目分类',
-          key: 'categoryId',
-          dataIndex: 'categoryId',
-          render: (text, record) => (
-            <span>{this.state.categoryMap.get(record.categoryId).label}</span>
-          )
-        },
-        {
-          title: '题目类型',
-          key: 'type',
-          dataIndex: 'type',
-          render: (text, record) => (
-            <span>{typeOptions.find(item => item.value === record.type).label}</span>
-          )
-        },
-        {
-          title: '题目难度',
-          key: 'level',
-          dataIndex: 'level',
-        },
-        {
-          title: '上线状态',
-          key: 'online',
-          dataIndex: 'online',
-          render: (text, record) => (
-            <Tag color={record.online ? '#87d068' : ''}>
-              {onlineOptions.find(item => item.value === record.online).label}
-            </Tag>
-          )
-        },
-        {
-          title: '审核状态',
-          key: 'status',
-          dataIndex: 'status',
-          render: (text, record) => (
-            <Tag color={(() => {
-              switch (record.status) {
-                case 0:
-                  return '#2db7f5';
-                case 1:
-                  return '#87d068';
-                case 2:
-                  return '#f50';
-                default:
-                  return '';
-              }
-            })()}>
-              {statusOptions.find(item => item.value === record.status).label}
-            </Tag>
-          )
-        },
-        {
-          title: '创建时间',
-          key: 'createdTime',
-          dataIndex: 'createdTime',
-          render: (text, record) => (
-            <span>{moment(record.createdTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-          )
-        },
-        {
-          title: '操作',
-          key: 'action',
-          width: 120,
-          render: (text, record) => (
-            <span className='btns'>
-              <Button type="link">预览</Button>
-              <Button type="link">编辑</Button>
-              <Button type="link">删除</Button>
-            </span>
-          ),
-        }
-      ]
-      const handleChange = value => { console.log(value) }
       return (
           <>
             <header className='filter-wrap'>
-              <Input className='filter-input' placeholder="输入题目名称" />
-              <Select
-                allowClear
-                placeholder="选择题目分类"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={this.state.categoryOptions}
-              />
-              <Select
-                allowClear
-                placeholder="选择题目类型"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={typeOptions}
-              />
-              <Select
-                allowClear
-                placeholder="选择题目难度"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={levelOptions}
-              />
-              <Select
-                allowClear
-                placeholder="上线状态"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={onlineOptions}
-              />
-              <Select
-                allowClear
-                placeholder="审核状态"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={statusOptions}
-              />
-              <ConfigProvider locale={locale}>
-                <RangePicker />
-              </ConfigProvider>
+              <div className='left'>
+                <Input className='filter-input' placeholder="输入题目名称" onPressEnter={(e) => this.changeInput(e)}/>
+                <Select
+                  allowClear
+                  placeholder="选择题目分类"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'categoryId')}
+                  options={this.state.categoryOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="选择题目类型"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'type')}
+                  options={this.typeOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="选择题目难度"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'level')}
+                  options={this.levelOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="上线状态"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'online')}
+                  options={this.onlineOptions}
+                />
+                <Select
+                  allowClear
+                  placeholder="审核状态"
+                  style={{ width: 150 }}
+                  onChange={(categoryId) => this.selectChange(categoryId, 'status')}
+                  options={this.statusOptions}
+                />
+                <ConfigProvider locale={locale}>
+                  <RangePicker />
+                </ConfigProvider>
+              </div>
+              <div className='right'>
+                <Button type="primary" onClick={() => this.openAddModal()}>新增题目</Button>
+              </div>
             </header>
-            <Table className='topic-table' columns={columns} dataSource={this.state.topicList} rowKey={i => i.id}/>
+            <Table className='topic-table' columns={this.columns} dataSource={this.state.topicList} rowKey={i => i.id}/>
+
+            <EditTopic
+              currentData={this.state.currentData}
+              editType={this.state.editType}
+              isModalOpen={this.state.isModalOpen} 
+              categoryOptions={this.state.categoryOptions}
+              onOk={() => this.handleModalOk()} 
+              onCancel={() => this.handleModalCancel()}/>
           </>
       );
     }

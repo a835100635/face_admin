@@ -1,14 +1,18 @@
 .filter-wrap {
   display: flex;
-  flex-wrap: wrap;
-  .filter-input {
-    width: 180px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-  .ant-select, .ant-picker  {
-    margin-right: 10px;
-    margin-bottom: 10px;
+  justify-content: space-between;
+  .left {
+    display: flex;
+    flex-wrap: wrap;
+    .filter-input {
+      width: 180px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .ant-select, .ant-picker  {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
   }
 }
 .topic-table {
