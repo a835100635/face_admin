@@ -6,31 +6,18 @@ import { getCategoryList } from '../../../api/category';
 import { getTopics } from '../../../api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
+
 
 const { RangePicker } = DatePicker;
 
 class Topic extends Component {
     constructor() {
       super();
-      this.levelOptions = Array.from({ length: 5 }, (v, k) => ({
-          label: k + 1,
-          value: k + 1
-      }));
-      this.typeOptions = [
-          { label: '选择题', value: 1 },
-          { label: '填空', value: 2 },
-          { label: '判断题', value: 3 },
-          { label: '开放题', value: 4 },
-      ];
-      this.onlineOptions = [
-        { label: '下线', value: 0 },
-        { label: '上线', value: 1 }
-      ]
-      this.statusOptions = [
-        { label: '待审核', value: 0 },
-        { label: '审核通过', value: 1 },
-        { label: '审核不通过', value: 2 },
-      ]
+      this.levelOptions = LEVEL_OPTIONS;
+      this.typeOptions = TOPIC_TYPE_OPTIONS;
+      this.onlineOptions = ONLINE_OPTIONS
+      this.statusOptions = STATUS_OPTIONS
       this.columns = [
         {
           title: '题目名称',
@@ -63,6 +50,9 @@ class Topic extends Component {
           title: '题目难度',
           key: 'level',
           dataIndex: 'level',
+          render: (text, record) => (
+            <span className='level'>{this.levelOptions.find(item => item.value === record.level).label}</span>
+          )
         },
         {
           title: '上线状态',
@@ -110,7 +100,7 @@ class Topic extends Component {
           render: (text, record) => (
             <span className='btns'>
               <Button type="link">预览</Button>
-              <Button type="link">编辑</Button>
+              <Button type="link" onClick={() => this.handleEdit(record)}>编辑</Button>
               <Button type="link" onClick={() => this.handleDelete(record)}>删除</Button>
             </span>
           ),
@@ -197,6 +187,16 @@ class Topic extends Component {
       })
     }
 
+    handleEdit(record) {
+      console.log(record);
+      this.setState({
+        currentData: record,
+        editType: 'edit'
+      }, () => {
+        this.openAddModal();
+      })
+    }
+
     /*
     * modal
     */
@@ -274,6 +274,7 @@ class Topic extends Component {
               currentData={this.state.currentData}
               editType={this.state.editType}
               isModalOpen={this.state.isModalOpen} 
+              categoryOptions={this.state.categoryOptions}
               onOk={() => this.handleModalOk()} 
               onCancel={() => this.handleModalCancel()}/>
           </>
