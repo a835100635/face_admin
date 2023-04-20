@@ -1,221 +1,284 @@
-import { Modal, Form, Input, Button, Select, Checkbox } from 'antd'; 
-import { CloseOutlined, ArrowUpOutlined, ArrowDownOutlined, EditOutlined } from '@ant-design/icons';
-import { TOPIC_TYPE_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
+import { Modal, Input, Button, Select, Checkbox, message } from 'antd'; 
+import { CloseOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { TOPIC_TYPE_OPTIONS, LEVEL_OPTIONS, BLANKS_TYPE, OPEN_TYPE, CONTENT_TYPE, EDITOR_TYPE } from '../../../constants';
 import { useState, useEffect } from 'react';
 import './editTopic.scss'
 import EditorModal from '../../../components/editorModal/editorModal'
 import hljs from 'highlight.js';
 
+const defaultData = {
+    topic: '',
+    categoryId: '',
+    answer: "",
+    type: '',
+    level: '',
+    online: 0,
+    status: 0,
+    options: [
+        {
+            key: 'A',
+            type: CONTENT_TYPE.TEXT,
+            value: 'a'
+        },
+        {
+            key: 'B',
+            type: CONTENT_TYPE.RICH_TEXT,
+            value: 'b'
+        },
+    ],
+    correct: [],
+    desc: ''
+}
+
 function EditTopic(props) {
-    const { editType, currentData, isModalOpen, onOk, onCancel,
-        categoryOptions } = props;
-    const onFinish = (values) => {
-        console.log('Success:', values);
-    };
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
-    const defaultData = {
-        topic: '',
-        categoryId: '',
-        answer: "<pre><code >function(){ console.log('eee') }</code></pre><p><br></p>",
-        type: '',
-        level: '',
-        online: 0,
-        status: 0,
-        options: {},
-        correct: '',
-        desc: ''
-    }
-    const [data, setData] = useState(currentData || defaultData);
+    const [messageApi, contextHolder] = message.useMessage();
+    const { editType, currentData, isModalOpen, onOk, onCancel, categoryOptions } = props;
+    // 编辑内容
+    const [data, setData] = useState(defaultData);
+    // 编辑器弹窗
     const [visible, setVisible] = useState(false);
     // 编辑内容
     const [editContent, setEditContent] = useState('');
     // 编辑内容类型
-    const [editContentType, setEditContentType] = useState({type: '', key: ''});
+    const [editContentType, setEditContentType] = useState({type: '', index: ''});
 
-    const addOptions = () => {
-        // ASCII 65 -> A
-        const optionsLength = Object.keys(data.options).length;
-        const currentIndex = optionsLength + 65;
-        const optionLabel = String.fromCharCode(currentIndex).toLocaleUpperCase();
-        setData({
-            ...data,
-            options: {
-                ...data.options,
-                [optionLabel]: ''
-            }
-        })
+    // modal确认
+    const onOkAction = () => {
+        onOk();
     }
-
-    const openEditorModal = (type, data, key) => {
+    // modal取消
+    const onCancelAction = () => {
+        onCancel();
+    }
+    // 打开编辑器弹窗
+    const openEditorModal = (type, data, index) => {
         setEditContent(data)
-        setEditContentType({type, key})
+        setEditContentType({type, index})
         setVisible(true)
     }
-
+    // 选项上移动
+    const moveUpOption = (index) => {
+        if(index === 0) return; 
+        const options = data.options;
+        const currentOption = options[index];
+        const prevOption = options[index - 1];
+        options[index] = prevOption;
+        options[index - 1] = currentOption;
+        setData({
+            ...data,
+            options: updateOptionsKey(options)
+        })
+    };
+    // 选项下移动
+    const moveDownOption = (index) => {
+        const options = data.options;
+        if(index === options.length - 1) return; 
+        const currentOption = options[index];
+        const nextOption = options[index + 1];
+        options[index] = nextOption;
+        options[index + 1] = currentOption;
+        setData({
+            ...data,
+            options: updateOptionsKey(options)
+        })
+    };
+    // 删除选项
+    const deleteOption = (index) => {
+        const options = data.options.filter((item, i) => i !== index);
+        setData({
+            ...data,
+            options: updateOptionsKey(options)
+        })
+    };
+    const addOptions = () => {
+        if (data.options.length >= 4) {
+            messageApi.warning('最多只能添加4个选项');
+            return;
+        }
+         // ASCII 65 -> A
+        const optionsLength = Object.keys(data.options).length;
+        const currentIndex = optionsLength + 65;
+        const key = String.fromCharCode(currentIndex).toLocaleUpperCase();
+        setData({
+            ...data,
+            options: [
+                ...data.options,
+                {
+                    key,
+                    type: CONTENT_TYPE.TEXT,
+                    value: ''
+                }
+            ]
+        })
+    };
+    // 更新选项key
+    const updateOptionsKey = (options) => {
+        options.forEach((item, index) => {
+            item.key = String.fromCharCode(index + 65).toLocaleUpperCase()
+        });
+        return options;
+    }
+    // 选项内容类型改变
+    const changeOptionType = (type, index) => {
+        const options = data.options;
+        options[index].type = type;
+        setData({
+            ...data,
+            options
+        })
+    }
+    // 编辑器弹窗确定
     const onHandleOk = (value) => {
-        const { editType, content } = value;
-        const { type, key } = editType;
-        console.log('===', type, content)
-        setVisible(false)
-        // 答案
-        if (type === 'answer') {
+        const { content, editType } = value;
+        const { type, index } = editType;
+        // 题目解析
+        if(type === EDITOR_TYPE.ANSWER) {
             setData({
                 ...data,
                 answer: content
             })
-        }
-        // 选择题
-        if (type === 'options') {
+        } else {
+            const options = data.options;
+            options[index].value = content;
             setData({
                 ...data,
-                options: {
-                    ...data.options,
-                    [key]: content
-                }
+                options
             })
         }
-        setEditContentType({type: '', key: ''})
-        setEditContent('')
+        onHandleCancel();
     }
+    // 编辑器弹窗取消
     const onHandleCancel = () => {
-        setVisible(false)
+        setVisible(false);
+        setEditContent('');
+        setEditContentType({type: '', index: ''});
     }
-
+    // 代码高亮
     useEffect(()=>{
         document.querySelectorAll("pre code").forEach(block => {
             try{hljs.highlightBlock(block);}
             catch(e){console.log(e);}
         });
     });
-
     return (
         <>
-            <Modal 
+            {contextHolder}
+            <Modal
+                width={900}
                 className='edit-topic-modal'
                 title={editType === 'add' ? '新增题目' :  `编辑题目-“${currentData.topic}”`} 
                 open={isModalOpen} 
-                onOk={onOk} 
-                onCancel={onCancel}>
-                <Form
-                    name="basic"
-                    labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 18 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={{ remember: true }}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                    <Form.Item
-                        label="题目名称"
-                        name="topic"
-                        rules={[{ required: true, message: '请输入题目名称' }]}
-                        >
-                        <Input placeholder="请输入题目名称"/>
-                    </Form.Item>
-
-                    <Form.Item
-                        label="题目分类"
-                        name="categoryId"
-                        rules={[{ required: true, message: '请选择题目分类' }]}
-                        >
+                onOk={onOkAction} 
+                onCancel={onCancelAction}>
+                <div className='edit-block'>
+                    <span className='label-warp'>
+                        <span className='label require'>题目内容</span>
+                    </span>
+                    <Input className='input' placeholder="请输入题目名称" showCount maxLength={50} />
+                </div>
+                <div className='edit-wrap'>
+                    <div className='edit-block'>
+                        <span className='label-warp'>
+                            <span className='label require'>题目分类</span>
+                        </span>
                         <Select 
                             placeholder="选择题目分类"
-                            style={{ width: 120 }}
+                            style={{ width: 150 }}
                             options={categoryOptions}
-                            />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="题目类型"
-                        name="type"
-                        rules={[{ required: true, message: '请选择题目类型' }]}
-                        >
-                        <Select
+                        />
+                    </div>
+                    <div className='edit-block'>
+                        <span className='label-warp'>
+                            <span className='label require'>题目类型</span>
+                        </span>
+                        <Select 
                             placeholder="选择题目类型"
-                            style={{ width: 120 }}
+                            style={{ width: 150 }}
                             options={TOPIC_TYPE_OPTIONS}
                         />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="难易程度"
-                        name="type"
-                        rules={[{ required: true, message: '请选择难易程度' }]}
-                        >
-                        <Select
-                            placeholder="选择题目类型"
-                            style={{ width: 120 }}
+                    </div>
+                    <div className='edit-block'>
+                        <span className='label-warp'>
+                            <span className='label require'>题目难度</span>
+                        </span>
+                        <Select 
+                            placeholder="请选择难易程度"
+                            style={{ width: 150 }}
                             options={LEVEL_OPTIONS}
                         />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="难易程度"
-                        name="type"
-                        rules={[{ required: true, message: '请选择难易程度' }]}
-                        >
-                        <Select
-                            placeholder="选择题目类型"
-                            style={{ width: 120 }}
-                            options={LEVEL_OPTIONS}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="解析"
-                        name="answer"
-                        rules={[{ required: false, message: '请输入题目解析' }]}
-                        >
-                        <div className="answer-content">
-                            <div className='content-wrap'>
-                                <p className='content' dangerouslySetInnerHTML={{ __html: data.answer }}></p>
-                            </div>
-                            <EditOutlined className='btn' onClick={() => openEditorModal('answer', data.answer)}/>
+                    </div>
+                </div>
+                <div className='edit-block'>
+                    <span className='label-warp'>
+                        <span className='label require'>题目解析</span>
+                    </span>
+                    <div className="answer-content">
+                        <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.ANSWER, data.answer)}>
+                            <p className='content' dangerouslySetInnerHTML={{ __html: data.answer }}></p>
                         </div>
-                    </Form.Item>
+                        {/* <EditOutlined className='icon-btn' onClick={() => openEditorModal('answer', data.answer)}/> */}
+                    </div>
+                </div>
 
-                    <Form.Item
-                        label="选项"
-                        name="options"
-                        rules={[{ required: true, message: '请选择难易程度' }]}
-                        >
-                        <div className="options">
-                            {
-                                Object.entries(data.options).map(([key, value], index) => {
-                                    return (
-                                        <div className='options-style' key={index}>
-                                            <Checkbox>{key}</Checkbox>
-                                            <div className='content-wrap' >
-                                                <p className='content' dangerouslySetInnerHTML={{ __html: value }}></p>
-                                            </div>
-                                            <EditOutlined className='icon-btn' onClick={() => openEditorModal('options', value, key)}/>
-                                            <ArrowUpOutlined className='icon-btn' />
-                                            <ArrowDownOutlined className='icon-btn' />
-                                            <CloseOutlined className='icon-btn' />
-                                        </div>
-                                    )
-                                })
-                            }
-                            <Button type="link" onClick={() => addOptions()}>
-                                添加选项
-                            </Button>
-                        </div>
-                    </Form.Item>
-
-                    <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
-                        <Checkbox>Remember me</Checkbox>
-                    </Form.Item>
-                            
-
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
+                <div className='edit-block edit-wrap'>
+                    <span className='label-warp'>
+                        <span className='label require'>题目选项</span>
+                    </span>
+                    <div className="options">
+                        {
+                            data.options.map(({key, value, type}, index) => {
+                                return (
+                                    <div className='options-style' key={index}>
+                                        <Checkbox>{key}</Checkbox>
+                                        <Select
+                                            className='text-select'
+                                            defaultValue={type}
+                                            style={{ width: 100 }}
+                                            options={[
+                                                {label: '文本', value: CONTENT_TYPE.TEXT},
+                                                {label: '富文本', value: CONTENT_TYPE.RICH_TEXT},
+                                            ]}
+                                            onChange={(value) => changeOptionType(value, index)}
+                                        />
+                                        {
+                                            (() => {
+                                                if(type === CONTENT_TYPE.TEXT) {
+                                                    return (
+                                                        <Input className='input' value={value} placeholder="请输入选项内容"/>
+                                                    )
+                                                } else {
+                                                    return (
+                                                        <>
+                                                            <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.OPTION, value, index)}>
+                                                                {/* <p className='content' dangerouslySetInnerHTML={{ __html: value }}></p> */}
+                                                                <p className='content'>{value}</p>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                            })()
+                                        }
+                                        {/* <EditOutlined  className='icon-btn' onClick={() => openEditorModal('options', value, key)}/> */}
+                                        <ArrowUpOutlined className={['icon-btn', index===0 && 'disable']} onClick={() => moveUpOption(index)}/>
+                                        <ArrowDownOutlined className={['icon-btn', index===data.options.length-1 && 'disable']} onClick={() => moveDownOption(index)}/>
+                                        <CloseOutlined className='icon-btn' onClick={() => deleteOption(index)}/>
+                                    </div>
+                                )
+                            })
+                        }
+                        <Button type="link" onClick={() => addOptions()}>
+                            添加选项
                         </Button>
-                    </Form.Item>
-                </Form>
+                    </div>
+                </div>
+
+                <div className='edit-block'>
+                    <span className='label-warp'>
+                        <span className='label'>题目描述</span>
+                    </span>
+                    <Input className='input' placeholder="请输入题目描述" showCount maxLength={50} />
+                </div>
+
             </Modal>
             <EditorModal 
                 visible={visible} 
