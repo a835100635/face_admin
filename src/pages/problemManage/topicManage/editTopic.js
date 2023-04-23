@@ -104,8 +104,7 @@ function EditTopic(props) {
           }
       }
       return true;
-  }
-      
+  }   
   // modal取消
   const onCancelAction = () => {
       onCancel();
@@ -143,12 +142,13 @@ function EditTopic(props) {
       })
   };
   // 删除选项
-  const deleteOption = (index) => {
+  const deleteOption = (index, key) => {
       const options = data.options.filter((item, i) => i !== index);
       setData({
           ...data,
-          options: updateOptionsKey(options)
-      })
+          options: updateOptionsKey(options),
+          correct: data.correct.filter((item) => item !== key)
+      });
   };
   const addOptions = () => {
       if (data.options.length >= 4) {
@@ -224,6 +224,37 @@ function EditTopic(props) {
   useEffect(() => {
     const isShow = [CHOICE_TYPE, JUDGE_TYPE].includes(data.type);
     setIsShowOptions(isShow);
+  }, [data.type])
+  // 弹框关闭重置data
+  useEffect(() => {
+    setData(defaultData);
+    // 编辑时初始化数据
+    if (isModalOpen && editType === 'edit') {
+      const editData = JSON.parse(JSON.stringify(currentData));
+      if ([CHOICE_TYPE, JUDGE_TYPE].includes(editData.type)) {
+        editData.correct = JSON.parse(editData.correct);
+        editData.options = JSON.parse(editData.options);
+      }
+      setData({
+        ...data,
+        ...editData
+      })
+    }
+  }, [isModalOpen])
+
+  // 编辑内容改变
+  const onEditChange = (value, key) => {
+    setData({
+      ...data,
+      [key]: value
+    }, () => {
+      if(key === 'type') {
+        onTypeChange();
+      }
+    });
+  }
+  const onTypeChange = (value) => {
+    const isShow = [CHOICE_TYPE, JUDGE_TYPE].includes(value);
     // 选择题和判断题 [] || ''
     if (isShow) {
       setData({
@@ -236,18 +267,6 @@ function EditTopic(props) {
         correct: ''
       })
     }
-  }, [data.type])
-  // 弹框关闭重置data
-  useEffect(() => {
-    setData(defaultData)
-  }, [isModalOpen])
-
-  // 编辑内容改变
-  const onEditChange = (value, key) => {
-      setData({
-          ...data,
-          [key]: value
-      })
   }
   // 选项内容改变
   const onOptionInputChange = (value, index) => {
@@ -274,153 +293,164 @@ function EditTopic(props) {
       })
     }
   }
+  const getCorrectCheckbox = (key) => {
+    const { correct } = data;
+    return correct.includes(key);
+  }
   return (
-      <>
-          {contextHolder}
-          <Modal
-              width={900}
-              maskClosable={false}
-              className='edit-topic-modal'
-              title={editType === 'add' ? '新增题目' :  `编辑题目-“${currentData.topic}”`} 
-              open={isModalOpen} 
-              onOk={onOkAction} 
-              onCancel={onCancelAction}>
-              <div className='edit-block'>
-                  <span className='label-warp'>
-                      <span className='label require'>题目名称</span>
-                  </span>
-                  <Input className='input' placeholder="请输入题目名称" showCount maxLength={50} onChange={(e) => onEditChange(e.target.value, 'topic')}/>
-              </div>
-              <div className='edit-wrap'>
-                  <div className='edit-block'>
-                      <span className='label-warp'>
-                          <span className='label require'>题目分类</span>
-                      </span>
-                      <Select 
-                          placeholder="选择题目分类"
-                          defaultValue={data.categoryId}
-                          style={{ width: 150 }}
-                          options={categoryOptions}
-                          onChange={(value) => onEditChange(value, 'categoryId')}
-                      />
-                  </div>
-                  <div className='edit-block'>
-                      <span className='label-warp'>
-                          <span className='label require'>题目类型</span>
-                      </span>
-                      <Select 
-                          placeholder="选择题目类型"
-                          defaultValue={data.type}
-                          style={{ width: 150 }}
-                          options={TOPIC_TYPE_OPTIONS}
-                          onChange={(value) => onEditChange(value, 'type')}
-                      />
-                  </div>
-                  <div className='edit-block'>
-                      <span className='label-warp'>
-                          <span className='label require'>题目难度</span>
-                      </span>
-                      <Select 
-                          placeholder="请选择难易程度"
-                          defaultValue={data.level}
-                          style={{ width: 150 }}
-                          options={LEVEL_OPTIONS}
-                          onChange={(value) => onEditChange(value, 'level')}
-                      />
-                  </div>
-              </div>
-              <div className='edit-block'>
-                  <span className='label-warp'>
-                      <span className='label require'>题目解析</span>
-                  </span>
-                  <div className="answer-content">
-                      <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.ANSWER, data.answer)}>
-                          <p className='content' dangerouslySetInnerHTML={{ __html: data.answer }}></p>
-                      </div>
-                      {/* <EditOutlined className='icon-btn' onClick={() => openEditorModal('answer', data.answer)}/> */}
-                  </div>
-              </div>
+    <>
+      {contextHolder}
+      <Modal
+        width={900}
+        maskClosable={false}
+        className='edit-topic-modal'
+        title={editType === 'add' ? '新增题目' :  `编辑题目 - “${currentData.topic}”`} 
+        open={isModalOpen} 
+        onOk={onOkAction} 
+        onCancel={onCancelAction}>
+        <div className='edit-block'>
+            <span className='label-warp'>
+                <span className='label require'>题目名称</span>
+            </span>
+            <Input 
+              className='input' 
+              placeholder="请输入题目名称" 
+              value={data.topic} 
+              showCount maxLength={50} 
+              onChange={(e) => onEditChange(e.target.value, 'topic')}/>
+        </div>
+        <div className='edit-wrap'>
+            <div className='edit-block'>
+                <span className='label-warp'>
+                    <span className='label require'>题目分类</span>
+                </span>
+                <Select 
+                    placeholder="选择题目分类"
+                    defaultValue={data.categoryId}
+                    value={data.categoryId}
+                    style={{ width: 150 }}
+                    options={categoryOptions}
+                    onChange={(value) => onEditChange(value, 'categoryId')}
+                />
+            </div>
+            <div className='edit-block'>
+                <span className='label-warp'>
+                    <span className='label require'>题目类型</span>
+                </span>
+                <Select 
+                    placeholder="选择题目类型"
+                    defaultValue={data.type}
+                    value={data.type}
+                    style={{ width: 150 }}
+                    options={TOPIC_TYPE_OPTIONS}
+                    onChange={(value) => onEditChange(value, 'type')}
+                />
+            </div>
+            <div className='edit-block'>
+                <span className='label-warp'>
+                    <span className='label require'>题目难度</span>
+                </span>
+                <Select 
+                    placeholder="请选择难易程度"
+                    defaultValue={data.level}
+                    value={data.level}
+                    style={{ width: 150 }}
+                    options={LEVEL_OPTIONS}
+                    onChange={(value) => onEditChange(value, 'level')}
+                />
+            </div>
+        </div>
+        <div className='edit-block'>
+            <span className='label-warp'>
+                <span className='label require'>题目解析</span>
+            </span>
+            <div className="answer-content">
+                <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.ANSWER, data.answer)}>
+                    <p className='content' dangerouslySetInnerHTML={{ __html: data.answer }}></p>
+                </div>
+                {/* <EditOutlined className='icon-btn' onClick={() => openEditorModal('answer', data.answer)}/> */}
+            </div>
+        </div>
 
-              {
-                  isShowOptions ? (
-                      <div className='edit-block edit-wrap'>
-                          <span className='label-warp'>
-                              <span className='label require'>题目选项</span>
-                          </span>
-                          <div className="options">
-                              {
-                                  data.options.map(({key, value, type}, index) => {
-                                      return (
-                                          <div className='options-style' key={index}>
-                                              <Checkbox onChange={(e) => onCorrectChange(e, key)} checked={data.correct.includes(key)}>{key}</Checkbox>
-                                              <Select
-                                                  className='text-select'
-                                                  defaultValue={type}
-                                                  value={type}
-                                                  style={{ width: 100 }}
-                                                  options={[
-                                                      {label: '文本', value: CONTENT_TYPE.TEXT},
-                                                      {label: '富文本', value: CONTENT_TYPE.RICH_TEXT},
-                                                  ]}
-                                                  onChange={(value) => changeOptionType(value, index)}
-                                              />
-                                              {
-                                                  (() => {
-                                                      if(type === CONTENT_TYPE.TEXT) {
-                                                          return (
-                                                              <Input className='input' value={value} placeholder="请输入选项内容" onChange={(e) => onOptionInputChange(e.target.value, index) }/>
-                                                          )
-                                                      } else {
-                                                          return (
-                                                              <>
-                                                                  <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.OPTION, value, index)}>
-                                                                      {/* <p className='content' dangerouslySetInnerHTML={{ __html: value }}></p> */}
-                                                                      <p className='content'>{value}</p>
-                                                                  </div>
-                                                              </>
-                                                          )
-                                                      }
-                                                  })()
-                                              }
-                                              {/* <EditOutlined  className='icon-btn' onClick={() => openEditorModal('options', value, key)}/> */}
-                                              <ArrowUpOutlined className={['icon-btn', index===0 && 'disable']} onClick={() => moveUpOption(index)}/>
-                                              <ArrowDownOutlined className={['icon-btn', index===data.options.length-1 && 'disable']} onClick={() => moveDownOption(index)}/>
-                                              <CloseOutlined className='icon-btn' onClick={() => deleteOption(index)}/>
-                                          </div>
-                                      )
-                                  })
-                              }
-                              <Button type="link" onClick={() => addOptions()}>
-                                  添加选项
-                              </Button>
-                          </div>
+        {
+          isShowOptions ? (
+            <div className='edit-block edit-wrap'>
+              <span className='label-warp'>
+                  <span className='label require'>题目选项</span>
+              </span>
+              <div className="options">
+                {
+                  data.options.map(({key, value, type}, index) => {
+                    return (
+                      <div className='options-style' key={index}>
+                        <Checkbox onChange={(e) => onCorrectChange(e, key)} checked={getCorrectCheckbox(key)}>{key}</Checkbox>
+                        <Select
+                          className='text-select'
+                          defaultValue={type}
+                          value={type}
+                          style={{ width: 100 }}
+                          options={[
+                              {label: '文本', value: CONTENT_TYPE.TEXT},
+                              {label: '富文本', value: CONTENT_TYPE.RICH_TEXT},
+                          ]}
+                          onChange={(value) => changeOptionType(value, index)}
+                        />
+                        {
+                          (() => {
+                            if(type === CONTENT_TYPE.TEXT) {
+                              return (
+                                <Input className='input' value={value} placeholder="请输入选项内容" onChange={(e) => onOptionInputChange(e.target.value, index) }/>
+                              )
+                            } else {
+                              return (
+                                <>
+                                  <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.OPTION, value, index)}>
+                                    {/* <p className='content' dangerouslySetInnerHTML={{ __html: value }}></p> */}
+                                    <p className='content'>{value}</p>
+                                  </div>
+                                </>
+                              )
+                            }
+                          })()
+                        }
+                        {/* <EditOutlined  className='icon-btn' onClick={() => openEditorModal('options', value, key)}/> */}
+                        <ArrowUpOutlined className={['icon-btn', index===0 && 'disable']} onClick={() => moveUpOption(index)}/>
+                        <ArrowDownOutlined className={['icon-btn', index===data.options.length-1 && 'disable']} onClick={() => moveDownOption(index)}/>
+                        <CloseOutlined className='icon-btn' onClick={() => deleteOption(index, key)}/>
                       </div>
-                  ) : (
-                      <div className='edit-block answer'>
-                          <span className='label-warp'>
-                              <span className='label require'>题目答案</span>
-                          </span>
-                          <Input className='input' placeholder="请输入题目答案" showCount maxLength={100} onChange={(e) => onEditChange(e.target.value, 'correct')}/>
-                      </div>
-                  )
-              }
-
-              <div className='edit-block desc'>
-                  <span className='label-warp'>
-                      <span className='label'>题目描述</span>
-                  </span>
-                  <Input className='input' placeholder="请输入题目描述" showCount maxLength={50}  onChange={(e) => onEditChange(e.target.value, 'desc')}/>
+                    )
+                  })
+                }
+                <Button type="link" onClick={() => addOptions()}>
+                  添加选项
+                </Button>
               </div>
+            </div>
+          ) : (
+            <div className='edit-block answer'>
+              <span className='label-warp'>
+                <span className='label require'>题目答案</span>
+              </span>
+              <Input className='input' placeholder="请输入题目答案" value={data.answer} showCount maxLength={100} onChange={(e) => onEditChange(e.target.value, 'correct')}/>
+            </div>
+          )
+        }
 
-          </Modal>
-          <EditorModal 
-              visible={visible} 
-              title='编辑详情'
-              editType={editContentType}
-              content={editContent}
-              onHandleOk={(e) => onHandleOk(e)} 
-              onHandleCancel={() => onHandleCancel()} />
-      </>
+        <div className='edit-block desc'>
+          <span className='label-warp'>
+            <span className='label'>题目描述</span>
+          </span>
+          <Input className='input' placeholder="请输入题目描述" value={data.desc} showCount maxLength={50}  onChange={(e) => onEditChange(e.target.value, 'desc')}/>
+        </div>
+      </Modal>
+      <EditorModal 
+        visible={visible} 
+        title='编辑详情'
+        editType={editContentType}
+        content={editContent}
+        onHandleOk={(e) => onHandleOk(e)} 
+        onHandleCancel={() => onHandleCancel()} />
+    </>
   )
 }
 
