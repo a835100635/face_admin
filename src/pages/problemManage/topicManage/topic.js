@@ -3,10 +3,10 @@ import './topic.scss'
 import { Input, Select, DatePicker, ConfigProvider, Table, Button, Tag, Tooltip } from 'antd';
 import locale from 'antd/locale/zh_CN';
 import { getCategoryList } from '../../../api/category';
-import { getTopics } from '../../../api/topic';
+import { getTopics, addTopic } from '../../../api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
-import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS, CHOICE_TYPE, JUDGE_TYPE } from '../../../constants';
 
 
 const { RangePicker } = DatePicker;
@@ -157,8 +157,6 @@ class Topic extends Component {
     getTopicList() {
       getTopics(this.state.query).then(res => {
         this.setState({ topicList: res.data, total: res.total });
-      }).catch(err => {
-        console.log(err);
       })
     }
     handleDelete(record) {
@@ -206,11 +204,20 @@ class Topic extends Component {
         isModalOpen: true
       })
     }
-    handleModalOk() {
-      console.log('handleModalOk')
-      this.setState({
-        isModalOpen: false
-      })
+    handleModalOk(data) {
+      console.log('handleModalOk', data);
+      const { type, options, correct } = data;
+      const params = {
+        ...data,
+        options: JSON.stringify(options),
+        correct: [CHOICE_TYPE, JUDGE_TYPE].includes(type) ? JSON.stringify(correct) : correct
+      };
+      addTopic(params).then(res => {
+        console.log('addTopic--', res);
+      });
+      // this.setState({
+      //   isModalOpen: false
+      // })
     }
     handleModalCancel() {
       console.log('handleModalCancel')
@@ -275,7 +282,7 @@ class Topic extends Component {
               editType={this.state.editType}
               isModalOpen={this.state.isModalOpen} 
               categoryOptions={this.state.categoryOptions}
-              onOk={() => this.handleModalOk()} 
+              onOk={(e) => this.handleModalOk(e)} 
               onCancel={() => this.handleModalCancel()}/>
           </>
       );

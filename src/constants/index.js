@@ -1,13 +1,17 @@
+// 选择题
+export const CHOICE_TYPE = 1;
 // 填空
 export const BLANKS_TYPE = 2;
+// 判断题
+export const JUDGE_TYPE = 3;
 // 开放题
 export const OPEN_TYPE = 4;
 
 // 题目类型
 export const TOPIC_TYPE_OPTIONS = [ 
-  { label: '选择题', value: 1 },
+  { label: '选择题', value: CHOICE_TYPE },
   { label: '填空', value: BLANKS_TYPE },
-  { label: '判断题', value: 3 },
+  { label: '判断题', value: JUDGE_TYPE },
   { label: '开放题', value: OPEN_TYPE },
 ]
 // 上线状态

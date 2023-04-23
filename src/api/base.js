@@ -1,5 +1,8 @@
 import Axios from 'axios';
-// import { message } from 'antd';
+import { message } from 'antd';
+
+// 错误集合
+const errorMap = new Map();
 
 // 全局设置
 const axiosInstance = Axios.create({
@@ -16,25 +19,46 @@ axiosInstance.interceptors.request.use(
     config.headers['X-Face-Token'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Im94eFFwNC1iMjNHVmRDNTBZX2tYZktlUC1RTE0iLCJpYXQiOjE2ODE4MTI3MDAsImV4cCI6MTY4MjQxNzUwMH0.BeIWFLC5UdeVyleLZJhKPMo1n6tmZArXZb9F6Yer__A';
 
     return config;
+  },
+  (error) => {
+    // 请求错误处理
+    return Promise.reject(error);
   }
 );
 
 // 响应拦截器
 axiosInstance.interceptors.response.use(
-  response => {
-    console.log('====', response)
+  async response => {
     // 对响应数据做点什么
     const { data, status, code, message } = response;
     if (status === 200) {
       return Promise.resolve(data.data);
     } else {
-      message.error('sdd')
       return Promise.reject(data || {
         code,
         data,
         message
       });
     }
+  },
+  (error) => {
+    // 请求错误处理
+    const { response } = error;
+    const { data, status } = response || {};
+    if (response && data) {
+      // 业务错误
+      error.code = status;
+      error.message = data.message;
+    }
+    // 避免重复提示
+    if (!errorMap.has(error.code)) {
+      errorMap.set(error.code, true);
+      message.error(error.message || '请求错误');
+      setTimeout(() => {
+        errorMap.delete(error.code);
+      }, 3000);
+    }
+    return Promise.reject(error);
   }
 );
 

@@ -87,6 +87,7 @@
 
   .edit-wrap {
     display: flex;
+    flex-wrap: wrap;
   }
   .edit-block {
     display: flex;
@@ -139,6 +140,9 @@
       .ant-btn-link { 
         padding: 0;
       }
+    }
+    &.desc, &.answer {
+      margin-top: 20px;
     }
   }
   .edit-block + .edit-wrap, .edit-wrap + .edit-block {
