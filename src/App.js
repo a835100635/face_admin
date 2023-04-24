@@ -6,6 +6,7 @@ import FeHeader from './components/header/header';
 import Home from './pages/home/home';
 import Category from './pages/problemManage/categoryManage/category';
 import Topic from './pages/problemManage/topicManage/topic';
+import VideoResource from './pages/resourceManage/videoResource/videoResource';
 
 function App() {
 
@@ -25,9 +26,11 @@ function App() {
             {/* 首页 */}
             <Route path="/" element={<Home />} />
             {/* 分类 */}
-            <Route path="/category" element={<Category />} />
+            <Route path="/problemManage/category" element={<Category />} />
             {/* 题目 */}
-            <Route path="/topic" element={<Topic />} />
+            <Route path="/problemManage/topic" element={<Topic />} />
+            
+            <Route path="/resource/video" element={<VideoResource />} />
           </Routes>
         </div>
       </main>
