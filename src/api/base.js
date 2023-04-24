@@ -15,8 +15,8 @@ const axiosInstance = Axios.create({
 axiosInstance.interceptors.request.use(
   config => {
     // 发送请求前做些什么
-    config.headers['X-ProductName'] = 'Face';
-    config.headers['X-Face-Token'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6Im94eFFwNC1iMjNHVmRDNTBZX2tYZktlUC1RTE0iLCJpYXQiOjE2ODE4MTI3MDAsImV4cCI6MTY4MjQxNzUwMH0.BeIWFLC5UdeVyleLZJhKPMo1n6tmZArXZb9F6Yer__A';
+    config.headers['X-ProductName'] = process.env.REACT_APP_PRODUCT_NAME;
+    config.headers['X-Face-Token'] = process.env.REACT_APP_FACE_TOKEN;
 
     return config;
   },
