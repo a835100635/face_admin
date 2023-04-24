@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import './topic.scss'
-import { Input, Select, DatePicker, ConfigProvider, Table, Button, Tag, Tooltip } from 'antd';
+import { Input, Select, DatePicker, ConfigProvider, Table, Button, Tag, Tooltip, message, Popconfirm } from 'antd';
 import locale from 'antd/locale/zh_CN';
 import { getCategoryList } from '../../../api/category';
-import { getTopics } from '../../../api/topic';
+import { getTopics, addTopic, updateTopic, deleteTopic } from '../../../api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
-import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS, CHOICE_TYPE, JUDGE_TYPE } from '../../../constants';
 
 
 const { RangePicker } = DatePicker;
@@ -94,6 +94,14 @@ class Topic extends Component {
           )
         },
         {
+          title: '更新时间',
+          key: 'updatedTime',
+          dataIndex: 'updatedTime',
+          render: (text, record) => (
+            <span>{moment(record.updatedTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+          )
+        },
+        {
           title: '操作',
           key: 'action',
           width: 120,
@@ -101,7 +109,14 @@ class Topic extends Component {
             <span className='btns'>
               <Button type="link">预览</Button>
               <Button type="link" onClick={() => this.handleEdit(record)}>编辑</Button>
-              <Button type="link" onClick={() => this.handleDelete(record)}>删除</Button>
+              <Popconfirm
+                description="确认删除此题目？"
+                onConfirm={() => this.deleteTopic(record.id)}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button type="link">删除</Button>
+              </Popconfirm>
             </span>
           ),
         }
@@ -128,6 +143,7 @@ class Topic extends Component {
           detail: 1
         }
       };
+
     }
 
     componentDidMount() {
@@ -157,13 +173,7 @@ class Topic extends Component {
     getTopicList() {
       getTopics(this.state.query).then(res => {
         this.setState({ topicList: res.data, total: res.total });
-      }).catch(err => {
-        console.log(err);
       })
-    }
-    handleDelete(record) {
-      console.log(record);
-
     }
 
     changeInput(e) {
@@ -206,14 +216,38 @@ class Topic extends Component {
         isModalOpen: true
       })
     }
-    handleModalOk() {
-      console.log('handleModalOk')
-      this.setState({
-        isModalOpen: false
-      })
+    async handleModalOk(data) {
+      console.log('handleModalOk', data);
+      const { type, options, correct } = data;
+      const params = {
+        ...data,
+        options: JSON.stringify(options),
+        correct: [CHOICE_TYPE, JUDGE_TYPE].includes(type) ? JSON.stringify(correct) : correct
+      };
+      try {
+        if(this.state.editType === 'add') {
+          await addTopic(params);
+        } else {
+          await updateTopic(params);
+        }
+        message.success('操作成功');
+        this.setState({
+          isModalOpen: false
+        });
+        this.getTopicList();
+      } catch (error) {
+        message.error('操作失败')
+      } 
+    }
+    async deleteTopic(topicId) {
+      try {
+        await deleteTopic(topicId);
+        message.success('删除成功');
+        this.getTopicList();
+      } catch (error) {
+      }
     }
     handleModalCancel() {
-      console.log('handleModalCancel')
       this.setState({
         isModalOpen: false
       })
@@ -275,7 +309,7 @@ class Topic extends Component {
               editType={this.state.editType}
               isModalOpen={this.state.isModalOpen} 
               categoryOptions={this.state.categoryOptions}
-              onOk={() => this.handleModalOk()} 
+              onOk={(e) => this.handleModalOk(e)} 
               onCancel={() => this.handleModalCancel()}/>
           </>
       );
