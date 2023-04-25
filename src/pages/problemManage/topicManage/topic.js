@@ -6,7 +6,7 @@ import { getCategoryList } from '../../../api/category';
 import { getTopics, addTopic, updateTopic, deleteTopic } from '../../../api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
-import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS, CHOICE_TYPE, JUDGE_TYPE } from '../../../constants';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '../../../constants';
 
 
 const { RangePicker } = DatePicker;
@@ -199,6 +199,10 @@ class Topic extends Component {
 
     handleEdit(record) {
       console.log(record);
+      const data = record;
+      const { options, correct } = data;
+      data.options = JSON.parse(options);
+      data.correct = correct.includes('[') ? JSON.parse(correct) : correct;
       this.setState({
         currentData: record,
         editType: 'edit'
@@ -211,18 +215,18 @@ class Topic extends Component {
     * modal
     */
     openAddModal() {
-      console.log('openAddModal')
       this.setState({
         isModalOpen: true
       })
     }
     async handleModalOk(data) {
-      console.log('handleModalOk', data);
-      const { type, options, correct } = data;
+      const { options, correct, answer } = data;
       const params = {
         ...data,
         options: JSON.stringify(options),
-        correct: [CHOICE_TYPE, JUDGE_TYPE].includes(type) ? JSON.stringify(correct) : correct
+        correct: typeof correct === 'string' ? correct : JSON.stringify(correct),
+        // 过滤富文本 TODO: 后期过滤空格
+        detail: answer === '<p><br></p>' ? '' : answer
       };
       try {
         if(this.state.editType === 'add') {
@@ -236,7 +240,7 @@ class Topic extends Component {
         });
         this.getTopicList();
       } catch (error) {
-        message.error('操作失败')
+        console.log(error);
       } 
     }
     async deleteTopic(topicId) {
@@ -245,6 +249,7 @@ class Topic extends Component {
         message.success('删除成功');
         this.getTopicList();
       } catch (error) {
+        console.log(error);
       }
     }
     handleModalCancel() {

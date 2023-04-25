@@ -22,7 +22,7 @@ const defaultData = {
   online: 0,
   status: 0,
   options: [],
-  correct: [],
+  correct: '',
   desc: ''
 }
 // 检验数据规则
@@ -31,7 +31,8 @@ const rules = {
   categoryId: { required: true, message: '请选择题目分类' },
   type: { required: true, message: '请选择题目类型' },
   level: { required: true, message: '请选择题目难度' },
-  answer: { required: true, message: '请输入题目解析' },
+  // TODO：临时 解析
+  answer: { required: false, message: '请输入题目解析' },
   options: { 
       required: true, 
       message: '请添加选项',
@@ -45,7 +46,7 @@ const rules = {
       } 
   },
   correct: { 
-    required: true, 
+    required: false, 
     message: '请选择正确答案', 
     validator: (rule, value, data, callback) => {
         // 非选择题不校验选项
@@ -53,10 +54,11 @@ const rules = {
             callback('至少需要一个选项');
             return false;
         }
-        if([OPEN_TYPE, BLANKS_TYPE].includes(data.type) && `${value}`.trim() === '') {
-            callback('请输入正确答案');
-            return false;
-        }
+        // TODO：临时 填空题、判断不校验答案
+        // if([OPEN_TYPE, BLANKS_TYPE].includes(data.type) && `${value}`.trim() === '') {
+        //     callback('请输入正确答案');
+        //     return false;
+        // }
         return true;
     } 
   },
@@ -224,6 +226,7 @@ function EditTopic(props) {
   useEffect(() => {
     const isShow = [CHOICE_TYPE, JUDGE_TYPE].includes(data.type);
     setIsShowOptions(isShow);
+    onTypeChange();
   }, [data.type])
   // 弹框关闭重置data
   useEffect(() => {
@@ -247,12 +250,9 @@ function EditTopic(props) {
     setData({
       ...data,
       [key]: value
-    }, () => {
-      if(key === 'type') {
-        onTypeChange();
-      }
     });
   }
+  // 类型改变
   const onTypeChange = (value) => {
     const isShow = [CHOICE_TYPE, JUDGE_TYPE].includes(value);
     // 选择题和判断题 [] || ''
@@ -297,6 +297,9 @@ function EditTopic(props) {
     const { correct } = data;
     return correct.includes(key);
   }
+  const getRequireClass = (key) => {
+    return rules[key].required ? 'label require' : 'label';
+  }
   return (
     <>
       {contextHolder}
@@ -310,7 +313,7 @@ function EditTopic(props) {
         onCancel={onCancelAction}>
         <div className='edit-block'>
             <span className='label-warp'>
-                <span className='label require'>题目名称</span>
+                <span className={getRequireClass('topic')}>题目名称</span>
             </span>
             <Input 
               className='input' 
@@ -322,7 +325,7 @@ function EditTopic(props) {
         <div className='edit-wrap'>
             <div className='edit-block'>
                 <span className='label-warp'>
-                    <span className='label require'>题目分类</span>
+                    <span className={getRequireClass('categoryId')}>题目分类</span>
                 </span>
                 <Select 
                     placeholder="选择题目分类"
@@ -335,7 +338,7 @@ function EditTopic(props) {
             </div>
             <div className='edit-block'>
                 <span className='label-warp'>
-                    <span className='label require'>题目类型</span>
+                    <span className={getRequireClass('type')}>题目类型</span>
                 </span>
                 <Select 
                     placeholder="选择题目类型"
@@ -348,7 +351,7 @@ function EditTopic(props) {
             </div>
             <div className='edit-block'>
                 <span className='label-warp'>
-                    <span className='label require'>题目难度</span>
+                    <span className={getRequireClass('topic')}>题目难度</span>
                 </span>
                 <Select 
                     placeholder="请选择难易程度"
@@ -362,7 +365,7 @@ function EditTopic(props) {
         </div>
         <div className='edit-block'>
             <span className='label-warp'>
-                <span className='label require'>题目解析</span>
+                <span className={getRequireClass('answer')}>题目解析</span>
             </span>
             <div className="answer-content">
                 <div className='content-wrap' onClick={() => openEditorModal(EDITOR_TYPE.ANSWER, data.answer)}>
@@ -376,7 +379,7 @@ function EditTopic(props) {
           isShowOptions ? (
             <div className='edit-block edit-wrap'>
               <span className='label-warp'>
-                  <span className='label require'>题目选项</span>
+                  <span className={getRequireClass('options')}>题目选项</span>
               </span>
               <div className="options">
                 {
@@ -429,9 +432,9 @@ function EditTopic(props) {
           ) : (
             <div className='edit-block answer'>
               <span className='label-warp'>
-                <span className='label require'>题目答案</span>
+                <span className={getRequireClass('correct')}>题目答案</span>
               </span>
-              <Input className='input' placeholder="请输入题目答案" value={data.answer} showCount maxLength={100} onChange={(e) => onEditChange(e.target.value, 'correct')}/>
+              <Input className='input' placeholder="请输入题目答案" value={data.correct} showCount maxLength={100} onChange={(e) => onEditChange(e.target.value, 'correct')}/>
             </div>
           )
         }

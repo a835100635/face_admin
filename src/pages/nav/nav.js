@@ -20,14 +20,26 @@ const navItems = [
     label: '习题管理',
     children: [
       {
-        key: '/category',
+        key: '/problemManage/category',
         label: '分类管理',
       },
       {
-        key: 'topic',
+        key: '/problemManage/topic',
         label: '题目管理',
       },
     ]
+  },
+  {
+    key: '/resource',
+    icon:  <ProfileOutlined />,
+    label: '资源管理',
+    children: [
+      {
+        key: '/resource/video',
+        label: '视频资源',
+      },
+    ]
+
   }
 
 ]
