@@ -1,8 +1,12 @@
-
 import { Space, Table, Button, Modal, Form, Input, Select, message } from 'antd';
 import { useState, useEffect } from 'react';
-import './category.scss'
-import { getCategoryList, addCategoryData, updateCategoryData, deleteCategoryAction } from '../../../api/category';
+import './category.scss';
+import {
+  getCategoryList,
+  addCategoryData,
+  updateCategoryData,
+  deleteCategoryAction
+} from '../../../api/category';
 
 function Category() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -11,30 +15,26 @@ function Category() {
     {
       title: '分类名称',
       key: 'categoryName',
-      dataIndex: 'categoryName',
+      dataIndex: 'categoryName'
     },
     {
       title: '所属分类',
       key: 'typeId',
       render: (text, record) => {
-        return (
-          <span>{record.typeId === 0 ? '前端' : '后端'}</span>
-        )
+        return <span>{record.typeId === 0 ? '前端' : '后端'}</span>;
       }
     },
     {
       title: '关联题目数量',
       key: 'topicCount',
-      dataIndex: 'topicCount',
+      dataIndex: 'topicCount'
     },
     {
       title: '分类描述',
       key: 'desc',
       dataIndex: 'desc',
       render: (text, record) => {
-        return (
-          <span>{record.desc || '-'}</span>
-        )
+        return <span>{record.desc || '-'}</span>;
       }
     },
     {
@@ -43,109 +43,119 @@ function Category() {
       width: 160,
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => openModal('edit', record)}>编辑</Button>
-          <Button type="link" onClick={() => deleteCategory(record)}>删除</Button>
+          <Button type="link" onClick={() => openModal('edit', record)}>
+            编辑
+          </Button>
+          <Button type="link" onClick={() => deleteCategory(record)}>
+            删除
+          </Button>
         </Space>
-      ),
-    },
+      )
+    }
   ];
 
-  const [data, setData] = useState([])
-  
+  const [data, setData] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 编辑类型
   const [ediType, setEdiType] = useState('add');
-  
+
   const handleModalCancel = () => {
     form.resetFields();
-    setOldCategoryData({})
+    setOldCategoryData({});
     setIsModalOpen(false);
-  }
-  
+  };
+
   // 旧数据
-  const [oldCategoryData, setOldCategoryData] = useState({})
-  let categoryData = {}
+  const [oldCategoryData, setOldCategoryData] = useState({});
+  const categoryData = {};
   const [form] = Form.useForm();
   const handleModalOk = async () => {
     try {
       // 校验数据
       await form.validateFields();
       const formData = form.getFieldsValue();
-      if(ediType === 'add') {
-        addCategory(formData)
+      if (ediType === 'add') {
+        addCategory(formData);
       }
       if (ediType === 'edit') {
-        updateCategory(formData)
+        updateCategory(formData);
       }
       form.resetFields();
-      setOldCategoryData({})
+      setOldCategoryData({});
     } catch (error) {
       messageApi.open({
         type: 'error',
-        content: '请输入完整',
-      })
+        content: '请输入完整'
+      });
     }
-  }
+  };
   const addCategory = (data) => {
-    addCategoryData(data).then((res) => {
-      setIsModalOpen(false);
-      fetchData();
-      messageApi.open({
-        type: 'success',
-        content: '新增成功',
+    addCategoryData(data)
+      .then(() => {
+        setIsModalOpen(false);
+        fetchData();
+        messageApi.open({
+          type: 'success',
+          content: '新增成功'
+        });
       })
-    }).catch((error) => {
-      messageApi.open({
-        type: 'error',
-        content: error.message,
-      })
-    })
-  }
+      .catch((error) => {
+        messageApi.open({
+          type: 'error',
+          content: error.message
+        });
+      });
+  };
 
   const updateCategory = (data) => {
     const updateData = {
       ...oldCategoryData,
       ...data
-    }
-    updateCategoryData(updateData).then(() => {
-      setIsModalOpen(false);
-      fetchData();
-      messageApi.open({
-        type: 'success',
-        content: '更新成功',
+    };
+    updateCategoryData(updateData)
+      .then(() => {
+        setIsModalOpen(false);
+        fetchData();
+        messageApi.open({
+          type: 'success',
+          content: '更新成功'
+        });
       })
-    }).catch((error) => {
-      messageApi.open({
-        type: 'error',
-        content: error.message,
-      })
-    })
-  }
+      .catch((error) => {
+        messageApi.open({
+          type: 'error',
+          content: error.message
+        });
+      });
+  };
 
   const openModal = (type, record) => {
     // 设置编辑类型
     setEdiType(type);
     if (type === 'edit' && record) {
-      setOldCategoryData(record)
+      setOldCategoryData(record);
       form.setFieldsValue(record);
     }
     // 打开弹窗
     setIsModalOpen(true);
-  }
+  };
   const deleteCategory = (record) => {
-    deleteCategoryAction(record.id).then(() => {
-      fetchData();
-      messageApi.open({
-        type: 'success',
-        content: '删除成功',
+    deleteCategoryAction(record.id)
+      .then(() => {
+        fetchData();
+        messageApi.open({
+          type: 'success',
+          content: '删除成功'
+        });
       })
-    }).catch((error) => {
-      messageApi.open({
-        type: 'error',
-        content: error.message,
-      })
-    });
-  }
+      .catch((error) => {
+        messageApi.open({
+          type: 'error',
+          content: error.message
+        });
+      });
+  };
 
   const modalTitle = () => {
     if (ediType === 'add') {
@@ -153,7 +163,7 @@ function Category() {
     } else {
       return '编辑分类';
     }
-  }
+  };
 
   const onFinish = (values) => {
     console.log('Success:', values);
@@ -166,33 +176,39 @@ function Category() {
     const result = await getCategoryList();
     const list = [];
     Object.keys(result).forEach((key) => {
-      list.push(...result[key])
-    })
+      list.push(...result[key]);
+    });
     setData(list);
-  }
+  };
   useEffect(() => {
     fetchData();
-  }, [])
-
+  }, []);
 
   return (
     <main className="category-wrap">
       {contextHolder}
       <header className="filter-wrap">
         {/* <Input placeholder="" />; */}
-        <Button type="primary" onClick={() => openModal('add')}>新增分类</Button>
+        <Button type="primary" onClick={() => openModal('add')}>
+          新增分类
+        </Button>
       </header>
-      <Table columns={columns} dataSource={data} rowKey={i => i.id}/>
-      <Modal title={modalTitle()} open={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel}>
+      <Table columns={columns} dataSource={data} rowKey={(i) => i.id} />
+      <Modal
+        title={modalTitle()}
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      >
         <Form
           name="basic"
           form={form}
-          labelCol={{ span: 4 }} 
-          wrapperCol={{span: 20}}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
-          initialValues={ categoryData }
+          initialValues={categoryData}
         >
           <Form.Item
             label="分类名称"
@@ -200,8 +216,8 @@ function Category() {
             rules={[
               {
                 required: true,
-                message: '请输入分类名称',
-              },
+                message: '请输入分类名称'
+              }
             ]}
           >
             <Input />
@@ -213,14 +229,14 @@ function Category() {
             rules={[
               {
                 required: true,
-                message: '请选择所属分类',
-              },
+                message: '请选择所属分类'
+              }
             ]}
           >
             <Select
               options={[
                 { value: 0, label: '前端' },
-                { value: 1, label: '后端' },
+                { value: 1, label: '后端' }
               ]}
             />
           </Form.Item>
@@ -231,8 +247,8 @@ function Category() {
             rules={[
               {
                 required: false,
-                message: '描述信息',
-              },
+                message: '描述信息'
+              }
             ]}
           >
             <Input />
