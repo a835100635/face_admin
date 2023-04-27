@@ -13,7 +13,7 @@ const axiosInstance = Axios.create({
 
 // 请求拦截器
 axiosInstance.interceptors.request.use(
-  config => {
+  (config) => {
     // 发送请求前做些什么
     config.headers['X-ProductName'] = process.env.REACT_APP_PRODUCT_NAME;
     config.headers['X-Face-Token'] = process.env.REACT_APP_FACE_TOKEN;
@@ -28,17 +28,19 @@ axiosInstance.interceptors.request.use(
 
 // 响应拦截器
 axiosInstance.interceptors.response.use(
-  async response => {
+  async (response) => {
     // 对响应数据做点什么
     const { data, status, code, message } = response;
     if (status === 200) {
       return Promise.resolve(data.data);
     } else {
-      return Promise.reject(data || {
-        code,
-        data,
-        message
-      });
+      return Promise.reject(
+        data || {
+          code,
+          data,
+          message
+        }
+      );
     }
   },
   (error) => {
