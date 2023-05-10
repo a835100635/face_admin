@@ -1,6 +1,11 @@
 import './nav.scss';
 import React from 'react';
-import { ProfileOutlined, AreaChartOutlined } from '@ant-design/icons';
+import {
+  ProfileOutlined,
+  AreaChartOutlined,
+  AppstoreAddOutlined,
+  TrademarkCircleOutlined
+} from '@ant-design/icons';
 import { Menu } from 'antd';
 
 import { useNavigate } from 'react-router-dom';
@@ -28,12 +33,23 @@ const navItems = [
   },
   {
     key: '/resource',
-    icon: <ProfileOutlined />,
+    icon: <AppstoreAddOutlined />,
     label: '资源管理',
     children: [
       {
         key: '/resource/file',
         label: '文件资源'
+      }
+    ]
+  },
+  {
+    key: '/integral',
+    icon: <TrademarkCircleOutlined />,
+    label: '积分管理',
+    children: [
+      {
+        key: '/integral/type',
+        label: '积分类型'
       }
     ]
   }

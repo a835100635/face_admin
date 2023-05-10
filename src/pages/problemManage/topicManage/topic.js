@@ -190,7 +190,8 @@ class Topic extends Component {
   // 获取题目列表
   getTopicList() {
     getTopics(this.state.query).then((res) => {
-      this.setState({ topicList: res.data, total: res.total });
+      const { data, total } = res;
+      this.setState({ topicList: data, total });
     });
   }
 
@@ -284,7 +285,20 @@ class Topic extends Component {
       isModalOpen: false
     });
   }
-
+  onDateChange(dates, dateStrings) {
+    this.setState(
+      {
+        query: {
+          ...this.state.query,
+          startTime: dateStrings[0],
+          endTime: dateStrings[1]
+        }
+      },
+      () => {
+        this.getTopicList();
+      }
+    );
+  }
   render() {
     return (
       <>
@@ -331,7 +345,10 @@ class Topic extends Component {
               options={this.statusOptions}
             />
             <ConfigProvider locale={locale}>
-              <RangePicker />
+              <RangePicker
+                format="YYYY-MM-DD"
+                onChange={(dates, dateStrings) => this.onDateChange(dates, dateStrings)}
+              />
             </ConfigProvider>
           </div>
           <div className="right">
