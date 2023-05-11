@@ -81,7 +81,6 @@ function Category() {
       if (ediType === 'edit') {
         updateCategory(formData);
       }
-      form.resetFields();
       setOldCategoryData({});
     } catch (error) {
       messageApi.open({
@@ -99,6 +98,7 @@ function Category() {
           type: 'success',
           content: '新增成功'
         });
+        form.resetFields();
       })
       .catch((error) => {
         messageApi.open({
@@ -121,6 +121,7 @@ function Category() {
           type: 'success',
           content: '更新成功'
         });
+        form.resetFields();
       })
       .catch((error) => {
         messageApi.open({

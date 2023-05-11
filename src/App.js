@@ -7,6 +7,7 @@ import Home from './pages/home/home';
 import Category from './pages/problemManage/categoryManage/category';
 import Topic from './pages/problemManage/topicManage/topic';
 import FileResource from './pages/resourceManage/fileResource/fileResource';
+import IntegralTypes from './pages/integralManage/types/types';
 
 function App() {
   const [collapsed, setCollapsed] = useState(true);
@@ -29,6 +30,8 @@ function App() {
             <Route path="/problemManage/topic" element={<Topic />} />
             {/* 文件资源 */}
             <Route path="/resource/file" element={<FileResource />} />
+            {/* 积分类型 */}
+            <Route path="/integral/type" element={<IntegralTypes />} />
           </Routes>
         </div>
       </main>

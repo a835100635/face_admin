@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import { message } from 'antd';
+import { message as Message } from 'antd';
 
 // 错误集合
 const errorMap = new Map();
@@ -21,6 +21,7 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.log(error);
     // 请求错误处理
     return Promise.reject(error);
   }
@@ -32,6 +33,11 @@ axiosInstance.interceptors.response.use(
     // 对响应数据做点什么
     const { data, status, code, message } = response;
     if (status === 200) {
+      const { code: dataCode, message: dataMessage } = data;
+      if (dataCode === -1) {
+        Message.error(dataMessage || '请求错误');
+        return Promise.reject(dataMessage);
+      }
       return Promise.resolve(data.data);
     } else {
       return Promise.reject(
@@ -55,7 +61,7 @@ axiosInstance.interceptors.response.use(
     // 避免重复提示
     if (!errorMap.has(error.code)) {
       errorMap.set(error.code, true);
-      message.error(error.message || '请求错误');
+      Message.error(error.message || '请求错误');
       setTimeout(() => {
         errorMap.delete(error.code);
       }, 3000);
