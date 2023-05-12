@@ -1,7 +1,7 @@
 import { $get, $post, $put, $delete } from './base';
 
 // 分类列表
-export const getCategoryList = () => $get('/api/category');
+export const getCategoryList = (data) => $get('/api/category', data);
 // 新建分类
 export const addCategoryData = (data) => $post('/api/category', data);
 // 编辑分类
