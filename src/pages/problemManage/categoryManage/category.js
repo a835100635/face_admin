@@ -7,6 +7,14 @@ import {
   updateCategoryData,
   deleteCategoryAction
 } from '../../../api/category';
+import { CATEGORY_TYPE } from '../../../constants';
+
+function getCategoryLabel(value) {
+  const category = Object.values(CATEGORY_TYPE).find(
+    (item) => item.value === value && !item.special
+  );
+  return category ? category.label : '-';
+}
 
 function Category() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -21,7 +29,7 @@ function Category() {
       title: '所属分类',
       key: 'typeId',
       render: (text, record) => {
-        return <span>{record.typeId === 0 ? '前端' : '后端'}</span>;
+        return <span>{getCategoryLabel(record.typeId)}</span>;
       }
     },
     {
@@ -234,12 +242,7 @@ function Category() {
               }
             ]}
           >
-            <Select
-              options={[
-                { value: 0, label: '前端' },
-                { value: 1, label: '后端' }
-              ]}
-            />
+            <Select options={Object.values(CATEGORY_TYPE).filter((item) => !item.special)} />
           </Form.Item>
 
           <Form.Item
