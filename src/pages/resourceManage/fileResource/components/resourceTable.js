@@ -3,11 +3,7 @@
  */
 
 function ResourceTable() {
-  return (
-    <div>
-      <p>文件资源管理列表</p>
-    </div>
-  );
+  return <div></div>;
 }
 
 export default ResourceTable;

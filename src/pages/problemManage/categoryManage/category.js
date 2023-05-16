@@ -182,7 +182,11 @@ function Category() {
   };
 
   const fetchData = async () => {
-    const result = await getCategoryList();
+    const { RESOURCE, INFORMATION } = CATEGORY_TYPE;
+    const result = await getCategoryList({
+      // 排除id
+      exclude: JSON.stringify([RESOURCE.value, INFORMATION.value])
+    });
     const list = [];
     Object.keys(result).forEach((key) => {
       list.push(...result[key]);

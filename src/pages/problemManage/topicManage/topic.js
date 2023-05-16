@@ -1,18 +1,6 @@
 import React, { Component } from 'react';
 import './topic.scss';
-import {
-  Input,
-  Select,
-  DatePicker,
-  ConfigProvider,
-  Table,
-  Button,
-  Tag,
-  Tooltip,
-  message,
-  Popconfirm
-} from 'antd';
-import locale from 'antd/locale/zh_CN';
+import { Input, Select, Table, Button, Tag, Tooltip, message, Popconfirm } from 'antd';
 import { getCategoryList } from '../../../api/category';
 import { getTopics, addTopic, updateTopic, deleteTopic } from '../../../api/topic';
 import moment from 'moment';
@@ -24,8 +12,7 @@ import {
   LEVEL_OPTIONS
 } from '../../../constants';
 
-const { RangePicker } = DatePicker;
-
+import FDatePicker from '../../../components/datePicker/datePicker.js';
 class Topic extends Component {
   constructor() {
     super();
@@ -344,12 +331,7 @@ class Topic extends Component {
               onChange={(categoryId) => this.selectChange(categoryId, 'status')}
               options={this.statusOptions}
             />
-            <ConfigProvider locale={locale}>
-              <RangePicker
-                format="YYYY-MM-DD"
-                onChange={(dates, dateStrings) => this.onDateChange(dates, dateStrings)}
-              />
-            </ConfigProvider>
+            <FDatePicker onChange={(dates, dateStrings) => this.onDateChange(dates, dateStrings)} />
           </div>
           <div className="right">
             <Button type="primary" onClick={() => this.openAddModal()}>
