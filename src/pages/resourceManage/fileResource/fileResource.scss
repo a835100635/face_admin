@@ -1,4 +1,11 @@
 .file-resource-wrap {
   height: 100%;
   display: flex;
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 14px;
+    box-sizing: border-box;
+  }
 }

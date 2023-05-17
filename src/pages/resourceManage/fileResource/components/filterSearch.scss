@@ -1,0 +1,21 @@
+.filter-search-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  .left {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+.re-modal-wrap {
+  .modal-item {
+    display: flex;
+    &-label {
+      width: 100px;
+    }
+    &-input {
+      flex: 1;
+    }
+  }
+}

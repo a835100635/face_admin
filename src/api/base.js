@@ -61,12 +61,12 @@ axiosInstance.interceptors.response.use(
     // 避免重复提示
     if (!errorMap.has(error.code)) {
       errorMap.set(error.code, true);
-      Message.error(error.message || '请求错误');
+      Message.error(error.message || `请检查后端服务是否正常 ${error.code}`);
       setTimeout(() => {
         errorMap.delete(error.code);
       }, 3000);
     }
-    return Promise.reject(error);
+    return false;
   }
 );
 
