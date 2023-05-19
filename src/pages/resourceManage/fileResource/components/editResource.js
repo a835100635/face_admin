@@ -2,9 +2,7 @@ import { Modal, Input, Select, InputNumber, message } from 'antd';
 import { useState, useEffect } from 'react';
 import './editResource.scss';
 import FUploadImage from '../../../../components/uploadImage/uploadImage';
-import { getCategoryList } from '../../../../api/category';
-import { CATEGORY_TYPE } from '../../../../constants';
-const typeId = CATEGORY_TYPE.RESOURCE.value;
+import { useSelector } from 'react-redux';
 const { TextArea } = Input;
 const rules = {
   title: { required: true, message: '请输入标题' },
@@ -58,8 +56,8 @@ const defaultData = {
   resourcePwd: '',
   tag: [],
   previewImage: [],
-  score: '',
-  price: '',
+  score: 0,
+  price: 0,
   // 1:积分 2:金额
   saleType: 1
 };
@@ -68,20 +66,16 @@ function EditResource({ isModalVisible, editType, onClose, onOk }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState(defaultData);
 
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  // 获取分类列表
-  const fetchCategory = () => {
-    getCategoryList({ typeId }).then((res) => {
-      if (res) {
-        const result = res[typeId] || [];
-        setCategoryOptions(result);
-      }
-    });
-  };
+  // 获取数据
+  const { categoryOptions } = useSelector((state) => {
+    const { resourceCategory } = state;
+    return {
+      categoryOptions: resourceCategory
+    };
+  });
+
   useEffect(() => {
-    if (isModalVisible) {
-      fetchCategory();
-    } else {
+    if (!isModalVisible) {
       setData(defaultData);
     }
   }, [isModalVisible]);
@@ -106,7 +100,7 @@ function EditResource({ isModalVisible, editType, onClose, onOk }) {
   const handleCancel = () => {
     onClose();
   };
-
+  // 校验数据
   const validateData = () => {
     for (const key in rules) {
       const rule = rules[key];
@@ -126,7 +120,6 @@ function EditResource({ isModalVisible, editType, onClose, onOk }) {
         }
       }
     }
-
     return true;
   };
 

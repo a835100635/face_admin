@@ -9,9 +9,12 @@ import FilterSearch from './components/filterSearch';
 import { CATEGORY_TYPE } from '../../../constants';
 import EditResource from './components/editResource';
 import { useState } from 'react';
+import { uploadResource } from '../../../api/resource';
+import { message } from 'antd';
 
 function FileResource() {
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [editType, setEditType] = useState('add');
   const onOpenModel = (type) => {
     setIsModalVisible(true);
@@ -19,11 +22,30 @@ function FileResource() {
   };
 
   const handleOk = (data) => {
-    console.log(data);
+    const body = {
+      ...data,
+      tag: JSON.stringify(data.tag),
+      previewImage: JSON.stringify(
+        data.previewImage.map((item) => {
+          return item.response.data.url;
+        })
+      )
+    };
+    uploadResource(body)
+      .then((res) => {
+        if (res) {
+          messageApi.success('新增成功');
+          setIsModalVisible(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
     <>
+      {contextHolder}
       <div className="file-resource-wrap">
         <Category showRightBorder typeId={CATEGORY_TYPE.RESOURCE.value} />
         <div className="main">
