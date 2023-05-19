@@ -1,3 +1,9 @@
 .resource-table {
   margin-top: 20px;
+  .btns {
+    display: flex;
+    .ant-btn {
+      padding: 4px 4px;
+    }
+  }
 }

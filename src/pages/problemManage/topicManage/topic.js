@@ -5,6 +5,7 @@ import { getCategoryList } from '@api/category';
 import { getTopics, addTopic, updateTopic, deleteTopic } from '@api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
+import StatusTag from '@components/statusTag/statusTag';
 import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '@constants';
 
 import FDatePicker from '@components/datePicker/datePicker.js';
@@ -65,24 +66,7 @@ class Topic extends Component {
         title: '审核状态',
         key: 'status',
         dataIndex: 'status',
-        render: (text, record) => (
-          <Tag
-            color={(() => {
-              switch (record.status) {
-                case 0:
-                  return '#2db7f5';
-                case 1:
-                  return '#87d068';
-                case 2:
-                  return '#f50';
-                default:
-                  return '';
-              }
-            })()}
-          >
-            {this.statusOptions.find((item) => item.value === record.status).label}
-          </Tag>
-        )
+        render: (text, record) => <StatusTag status={record.status} />
       },
       {
         title: '创建时间',

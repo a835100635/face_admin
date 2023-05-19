@@ -62,7 +62,7 @@ const defaultData = {
   saleType: 1
 };
 
-function EditResource({ isModalVisible, editType, onClose, onOk }) {
+function EditResource({ isModalVisible, editType, onClose, onOk, editData }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState(defaultData);
 
@@ -75,8 +75,22 @@ function EditResource({ isModalVisible, editType, onClose, onOk }) {
   });
 
   useEffect(() => {
-    if (!isModalVisible) {
-      setData(defaultData);
+    setData(defaultData);
+    if (editType === 'edit' && editData.id) {
+      console.log('editData', editData);
+      const oldData = {
+        ...editData,
+        previewImage: JSON.parse(editData.previewImage).map((item) => {
+          return {
+            uid: item,
+            url: item,
+            name: item.split('/')[item.split('/').length - 1],
+            status: 'done'
+          };
+        }),
+        tag: JSON.parse(editData.tag)
+      };
+      setData(oldData);
     }
   }, [isModalVisible]);
 
@@ -126,6 +140,7 @@ function EditResource({ isModalVisible, editType, onClose, onOk }) {
   const handleOk = () => {
     // 校验数据
     if (!validateData()) return;
+
     onOk(data);
   };
   return (
