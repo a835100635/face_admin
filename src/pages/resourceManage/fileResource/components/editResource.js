@@ -1,7 +1,7 @@
 import { Modal, Input, Select, InputNumber, message } from 'antd';
 import { useState, useEffect } from 'react';
 import './editResource.scss';
-import FUploadImage from '../../../../components/uploadImage/uploadImage';
+import FUploadImage from '@components/uploadImage/uploadImage';
 import { useSelector } from 'react-redux';
 const { TextArea } = Input;
 const rules = {

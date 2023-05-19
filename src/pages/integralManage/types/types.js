@@ -10,7 +10,7 @@ import {
   integrationTypeAdd,
   integrationTypeUpdate,
   integrationTypeDelete
-} from '../../../api/integration';
+} from '@api/integration';
 
 function IntegralTypes() {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -4,7 +4,7 @@
 
 import './filterSearch.scss';
 import { Input, Button } from 'antd';
-import FDatePicker from '../../../../components/datePicker/datePicker.js';
+import FDatePicker from '@components/datePicker/datePicker.js';
 
 function FilterSearch({ onOpenModel, onDateChange }) {
   const onChange = (dates, dateStrings) => {

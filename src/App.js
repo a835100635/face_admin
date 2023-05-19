@@ -2,7 +2,7 @@ import './App.scss';
 import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Nav from './pages/nav/nav';
-import FeHeader from './components/header/header';
+import FeHeader from '@components/header/header';
 import Home from './pages/home/home';
 import Category from './pages/problemManage/categoryManage/category';
 import Topic from './pages/problemManage/topicManage/topic';

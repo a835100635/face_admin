@@ -9,10 +9,10 @@ import {
   BLANKS_TYPE,
   CHOICE_TYPE,
   JUDGE_TYPE
-} from '../../../constants';
+} from '@constants';
 import { useState, useEffect } from 'react';
 import './editTopic.scss';
-import EditorModal from '../../../components/editorModal/editorModal';
+import EditorModal from '@components/editorModal/editorModal';
 import hljs from 'highlight.js';
 
 const defaultData = {

@@ -73,7 +73,7 @@ module.exports = {
     // 不允许使用eval
     'no-eval': 'error',
     // 不允许使用==
-    'no-eq-null': 'error',
+    'no-eq-null': 0,
     // 不允许出现未使用变量
     'no-unused-vars': 'error',
     // 不允许出现无法执行的代码
