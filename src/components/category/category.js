@@ -13,6 +13,9 @@ import {
   updateCategoryData,
   deleteCategoryAction
 } from '../../api/category';
+import Store from '../../store';
+import { change_resource_category } from '../../store/actionCreatores';
+import { useSelector } from 'react-redux';
 
 function PopoverChildren({ onEvent }) {
   const emitEvent = (e, type) => {
@@ -32,10 +35,15 @@ function PopoverChildren({ onEvent }) {
 }
 
 function Category({ showRightBorder, typeId }) {
+  // 获取数据
+  const { data } = useSelector((state) => {
+    const { resourceCategory } = state;
+    return {
+      data: resourceCategory
+    };
+  });
   // 是否显示右边框
   const showRBorder = showRightBorder ? 'show-right-border' : '';
-  // 所有数据
-  const [data, setData] = useState([]);
   // 展示分类
   const [list, setList] = useState([]);
   // 当前选中的分类
@@ -63,7 +71,7 @@ function Category({ showRightBorder, typeId }) {
   const onSearchChange = (e) => {
     const results = data.filter((item) => {
       const regex = new RegExp(`${e.target.value}`, 'i');
-      return item.title.match(regex);
+      return item.categoryName.match(regex);
     });
     setList(results || []);
   };
@@ -141,9 +149,11 @@ function Category({ showRightBorder, typeId }) {
   const fetchCategory = () => {
     getCategoryList({ typeId }).then((res) => {
       if (res) {
-        const result = res[typeId] || [];
-        setData(result);
-        setList(result);
+        Store.dispatch({
+          type: change_resource_category().type,
+          value: res[typeId] || []
+        });
+        setList(res[typeId]);
       }
     });
   };

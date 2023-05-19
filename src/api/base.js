@@ -39,6 +39,9 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(dataMessage);
       }
       return Promise.resolve(data.data);
+    } else if (status === 204) {
+      Message.error('No Content');
+      return false;
     } else {
       return Promise.reject(
         data || {
