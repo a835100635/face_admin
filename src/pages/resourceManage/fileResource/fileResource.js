@@ -3,13 +3,13 @@
  * @returns
  */
 import './fileResource.scss';
-import Category from '../../../components/category/category';
+import Category from '@components/category/category';
 import ResourceTable from './components/resourceTable';
 import FilterSearch from './components/filterSearch';
-import { CATEGORY_TYPE } from '../../../constants';
+import { CATEGORY_TYPE } from '@constants';
 import EditResource from './components/editResource';
 import { useState } from 'react';
-import { uploadResource } from '../../../api/resource';
+import { uploadResource } from '@api/resource';
 import { message } from 'antd';
 
 function FileResource() {

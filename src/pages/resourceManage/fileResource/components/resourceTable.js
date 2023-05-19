@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import './resourceTable.scss';
 import { Table } from 'antd';
-import { getResourceList } from '../../../../api/resource';
+import { getResourceList } from '@api/resource';
 
 const columns = [
   {

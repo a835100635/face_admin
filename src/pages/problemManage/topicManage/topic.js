@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 import './topic.scss';
 import { Input, Select, Table, Button, Tag, Tooltip, message, Popconfirm } from 'antd';
-import { getCategoryList } from '../../../api/category';
-import { getTopics, addTopic, updateTopic, deleteTopic } from '../../../api/topic';
+import { getCategoryList } from '@api/category';
+import { getTopics, addTopic, updateTopic, deleteTopic } from '@api/topic';
 import moment from 'moment';
 import EditTopic from './editTopic';
-import {
-  TOPIC_TYPE_OPTIONS,
-  ONLINE_OPTIONS,
-  STATUS_OPTIONS,
-  LEVEL_OPTIONS
-} from '../../../constants';
+import { TOPIC_TYPE_OPTIONS, ONLINE_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS } from '@constants';
 
-import FDatePicker from '../../../components/datePicker/datePicker.js';
+import FDatePicker from '@components/datePicker/datePicker.js';
 class Topic extends Component {
   constructor() {
     super();

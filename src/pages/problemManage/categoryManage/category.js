@@ -6,8 +6,8 @@ import {
   addCategoryData,
   updateCategoryData,
   deleteCategoryAction
-} from '../../../api/category';
-import { CATEGORY_TYPE } from '../../../constants';
+} from '@api/category';
+import { CATEGORY_TYPE } from '@constants';
 
 function getCategoryLabel(value) {
   const category = Object.values(CATEGORY_TYPE).find(

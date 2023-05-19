@@ -12,9 +12,9 @@ import {
   addCategoryData,
   updateCategoryData,
   deleteCategoryAction
-} from '../../api/category';
-import Store from '../../store';
-import { change_resource_category } from '../../store/actionCreatores';
+} from '@api/category';
+import Store from '@store';
+import { change_resource_category } from '@store/actionCreatores';
 import { useSelector } from 'react-redux';
 
 function PopoverChildren({ onEvent }) {
