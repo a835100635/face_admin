@@ -8,7 +8,6 @@ import FDatePicker from '@components/datePicker/datePicker.js';
 
 function FilterSearch({ onOpenModel, onDateChange }) {
   const onChange = (dates, dateStrings) => {
-    console.log(dates, dateStrings);
     onDateChange(dates, dateStrings);
   };
   const openModal = () => {

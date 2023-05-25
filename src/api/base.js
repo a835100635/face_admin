@@ -36,9 +36,9 @@ axiosInstance.interceptors.response.use(
       const { code: dataCode, message: dataMessage } = data;
       if (dataCode === -1) {
         Message.error(dataMessage || '请求错误');
-        return Promise.reject(dataMessage);
+        return false;
       }
-      return Promise.resolve(data.data);
+      return Promise.resolve(data.data || {});
     } else if (status === 204) {
       Message.error('No Content');
       return false;
