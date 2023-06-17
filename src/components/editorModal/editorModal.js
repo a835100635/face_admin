@@ -11,7 +11,25 @@ function EditorModal(props) {
   const toolbarConfig = {};
   const editorConfig = {
     // JS 语法
-    placeholder: '请输入内容...'
+    placeholder: '请输入内容...',
+    MENU_CONF: {
+      uploadImage: {
+        server: '/api/upload',
+        fieldName: 'file',
+        allowedFileTypes: ['image/*'],
+        withCredentials: true,
+        // 自定义插入图片
+        customInsert(res, insertFn) {
+          // res 即服务端的返回结果
+          const { data } = res;
+          const { url } = data;
+          console.log('--', res, insertFn);
+          // 从 res 中找到 url alt href ，然后插入图片
+          // TODO:
+          insertFn(url);
+        }
+      }
+    }
   };
 
   // 及时销毁 editor ，重要！

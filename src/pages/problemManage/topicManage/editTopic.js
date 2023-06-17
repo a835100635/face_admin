@@ -240,8 +240,8 @@ function EditTopic(props) {
     if (isModalOpen && editType === 'edit') {
       const editData = JSON.parse(JSON.stringify(currentData));
       if ([CHOICE_TYPE, JUDGE_TYPE].includes(editData.type)) {
-        editData.correct = JSON.parse(editData.correct);
-        editData.options = JSON.parse(editData.options);
+        // editData.correct = JSON.parse(editData.correct);
+        // editData.options = JSON.parse(editData.options);
       }
       setData({
         ...data,

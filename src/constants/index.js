@@ -136,3 +136,67 @@ export const CATEGORY_TYPE = {
     value: -1
   }
 };
+
+// 分类图标
+export const CATEGORY_TYPE_ICONS = {
+  HTML: {
+    label: 'HTML',
+    value: 'icon-html'
+  },
+  CSS: {
+    label: 'CSS',
+    value: 'icon-css'
+  },
+  JAVASCRIPT: {
+    label: 'javascript',
+    value: 'icon-Javascript-icon-02'
+  },
+  VUE: {
+    label: 'Vue',
+    value: 'icon-Vue'
+  },
+  ELECTRON: {
+    label: 'Electron',
+    value: 'icon-electron'
+  },
+  NODE: {
+    label: 'Node',
+    value: 'icon-Nodejs'
+  },
+  REACT: {
+    label: 'React',
+    value: 'icon-React'
+  },
+  WEBPACK: {
+    label: 'Webpack',
+    value: 'icon-webpack'
+  },
+  ANGULAR: {
+    label: 'Angular',
+    value: 'icon-Angular'
+  },
+  TYPESCRIPT: {
+    label: 'Typescript',
+    value: 'icon-typescript'
+  },
+  SPRING_BOOT: {
+    label: 'SpringBoot',
+    value: 'icon-bxl-spring-boot'
+  },
+  PYTHON: {
+    label: 'Python',
+    value: 'icon-py'
+  },
+  PHP: {
+    label: 'php',
+    value: 'icon-php'
+  },
+  NGINX: {
+    label: 'Nginx',
+    value: 'icon-nginx'
+  },
+  JAVA: {
+    label: 'Java',
+    value: 'icon-java'
+  }
+};

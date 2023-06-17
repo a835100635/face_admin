@@ -7,7 +7,9 @@ import {
   updateCategoryData,
   deleteCategoryAction
 } from '@api/category';
-import { CATEGORY_TYPE } from '@constants';
+import { CATEGORY_TYPE, CATEGORY_TYPE_ICONS } from '@constants';
+const { Option } = Select;
+import IconSvg from '@components/iconfontSvg';
 
 function getCategoryLabel(value) {
   const category = Object.values(CATEGORY_TYPE).find(
@@ -30,6 +32,14 @@ function Category() {
       key: 'typeId',
       render: (text, record) => {
         return <span>{getCategoryLabel(record.typeId)}</span>;
+      }
+    },
+    {
+      title: '展示图标',
+      key: 'icon',
+      dataIndex: 'icon',
+      render: (text, record) => {
+        return record.icon ? <IconSvg iconClass={record.icon} /> : '-';
       }
     },
     {
@@ -247,6 +257,25 @@ function Category() {
             ]}
           >
             <Select options={Object.values(CATEGORY_TYPE).filter((item) => !item.special)} />
+          </Form.Item>
+
+          <Form.Item
+            label="展示图标"
+            name="icon"
+            rules={[
+              {
+                required: true,
+                message: '请选择展示图标'
+              }
+            ]}
+          >
+            <Select>
+              {Object.values(CATEGORY_TYPE_ICONS).map((item) => (
+                <Option value={item.value} key={item.value}>
+                  <IconSvg iconClass={item.value} />
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item

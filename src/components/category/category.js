@@ -126,7 +126,8 @@ function Category({ showRightBorder, typeId }) {
 
   const onChildEvent = (type, data) => {
     if (type === 'delete') {
-      deleteCategoryAction(data.id).then(() => {
+      deleteCategoryAction(data.id).then((res) => {
+        if (!res) return;
         message.success('删除成功');
         fetchCategory();
         setIsModalOpen(false);
@@ -153,7 +154,7 @@ function Category({ showRightBorder, typeId }) {
           type: change_resource_category().type,
           value: res[typeId] || []
         });
-        setList(res[typeId]);
+        setList(res[typeId] || []);
       }
     });
   };
