@@ -31,7 +31,9 @@ function ResourceTable({ onOpenModel, onDelete }) {
       dataIndex: 'categoryId',
       key: 'categoryId',
       render: (text, record) => (
-        <span>{resourceCategory.find((item) => item.id === record.categoryId).categoryName}</span>
+        <span>
+          {resourceCategory.find((item) => item.id === record.categoryId)?.categoryName || '-'}
+        </span>
       )
     },
     {
