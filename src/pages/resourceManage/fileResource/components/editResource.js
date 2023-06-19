@@ -170,7 +170,7 @@ function EditResource({ isModalVisible, editType, onClose, onOk, editData }) {
         <div className="edit-wrap">
           <div className="edit-block">
             <span className="label-warp">
-              <span className={getRequireClass('categoryId')}>题目分类</span>
+              <span className={getRequireClass('categoryId')}>资源分类</span>
             </span>
             <Select
               placeholder="分类"

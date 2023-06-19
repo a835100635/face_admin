@@ -8,7 +8,8 @@ import {
   OPEN_TYPE,
   BLANKS_TYPE,
   CHOICE_TYPE,
-  JUDGE_TYPE
+  JUDGE_TYPE,
+  ANALYSIS_TYPE
 } from '@constants';
 import { useState, useEffect } from 'react';
 import './editTopic.scss';
@@ -17,6 +18,7 @@ import hljs from 'highlight.js';
 
 const defaultData = {
   topic: '',
+  topicDesc: '',
   categoryId: null,
   answer: '',
   type: null,
@@ -30,6 +32,7 @@ const defaultData = {
 // 检验数据规则
 const rules = {
   topic: { required: true, message: '请输入题目名称' },
+  topicDesc: { required: false, message: '请输入题目描述' },
   categoryId: { required: true, message: '请选择题目分类' },
   type: { required: true, message: '请选择题目类型' },
   level: { required: true, message: '请选择题目难度' },
@@ -40,7 +43,7 @@ const rules = {
     message: '请添加选项',
     validator: (rule, value, data, callback) => {
       // 非选择题不校验选项
-      if (![OPEN_TYPE, BLANKS_TYPE].includes(data.type) && value.length < 2) {
+      if (![OPEN_TYPE, BLANKS_TYPE, ANALYSIS_TYPE].includes(data.type) && value.length < 2) {
         callback('选项不能少于2个');
         return false;
       }
@@ -201,6 +204,11 @@ function EditTopic(props) {
         ...data,
         answer: content
       });
+    } else if (type === EDITOR_TYPE.TOPIC_DESC) {
+      setData({
+        ...data,
+        topicDesc: content
+      });
     } else {
       const options = data.options;
       options[index].value = content;
@@ -300,6 +308,7 @@ function EditTopic(props) {
   };
   const getCorrectCheckbox = (key) => {
     const { correct } = data;
+    console.log('==getCorrectCheckbox', correct, '-', key);
     return correct.includes(key);
   };
   const getRequireClass = (key) => {
@@ -329,6 +338,19 @@ function EditTopic(props) {
             maxLength={50}
             onChange={(e) => onEditChange(e.target.value, 'topic')}
           />
+        </div>
+        <div className="edit-block" style={{ marginTop: '20px' }}>
+          <span className="label-warp">
+            <span className={getRequireClass('topicDesc')}>题目描述</span>
+          </span>
+          <div className="answer-content">
+            <div
+              className="content-wrap"
+              onClick={() => openEditorModal(EDITOR_TYPE.TOPIC_DESC, data.topicDesc)}
+            >
+              <p className="content" dangerouslySetInnerHTML={{ __html: data.topicDesc }}></p>
+            </div>
+          </div>
         </div>
         <div className="edit-wrap">
           <div className="edit-block">
@@ -382,7 +404,6 @@ function EditTopic(props) {
             >
               <p className="content" dangerouslySetInnerHTML={{ __html: data.answer }}></p>
             </div>
-            {/* <EditOutlined className='icon-btn' onClick={() => openEditorModal('answer', data.answer)}/> */}
           </div>
         </div>
 

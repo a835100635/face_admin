@@ -6,13 +6,16 @@ export const BLANKS_TYPE = 2;
 export const JUDGE_TYPE = 3;
 // 开放题
 export const OPEN_TYPE = 4;
+// 解析
+export const ANALYSIS_TYPE = 5;
 
 // 题目类型
 export const TOPIC_TYPE_OPTIONS = [
   { label: '选择题', value: CHOICE_TYPE },
   { label: '填空', value: BLANKS_TYPE },
   { label: '判断题', value: JUDGE_TYPE },
-  { label: '开放题', value: OPEN_TYPE }
+  { label: '开放题', value: OPEN_TYPE },
+  { label: '解析', value: ANALYSIS_TYPE }
 ];
 // 上线状态
 export const ONLINE_OPTIONS = [
@@ -52,7 +55,9 @@ export const EDITOR_TYPE = {
   // 答案
   ANSWER: 1,
   // 选项
-  OPTION: '2'
+  OPTION: 2,
+  // 题目描述
+  TOPIC_DESC: 3
 };
 // 分类类型
 export const CATEGORY_TYPE = {

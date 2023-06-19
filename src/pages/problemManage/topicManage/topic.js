@@ -192,7 +192,7 @@ class Topic extends Component {
     console.log(record);
     const data = record;
     const { options, correct } = data;
-    data.options = JSON.parse(options);
+    data.options = Array.isArray(options) ? options : JSON.parse(options);
     data.correct = correct.includes('[') ? JSON.parse(correct) : correct;
     this.setState(
       {
